@@ -1,8 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Toolkit\PFlagTest;
+namespace PhpPkg\FastTplTest;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionException;
+use ReflectionMethod;
+use RuntimeException;
+use Throwable;
 
 /**
  * Class BaseTestCase
@@ -34,7 +38,7 @@ abstract class BaseTestCase extends TestCase
     {
         // $class  = new \ReflectionClass($class);
         // $method = $class->getMethod($method);
-        
+
         $method = new \ReflectionMethod($class, $method);
         $method->setAccessible(true);
 
@@ -54,6 +58,6 @@ abstract class BaseTestCase extends TestCase
             return $e;
         }
 
-        return new RuntimeException('NO ERROR');
+        return new RuntimeException('NO ERROR', -1);
     }
 }
