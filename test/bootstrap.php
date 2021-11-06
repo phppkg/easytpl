@@ -8,8 +8,8 @@ date_default_timezone_set('Asia/Shanghai');
 
 $libDir = dirname(__DIR__);
 $npMap  = [
-    'PhpPkg\\FastTplTest\\' => $libDir . '/test/',
-    'PhpPkg\\FastTpl\\'     => $libDir . '/src/',
+    'PhpPkg\\EasyTplTest\\' => $libDir . '/test/',
+    'PhpPkg\\EasyTpl\\'     => $libDir . '/src/',
 ];
 
 spl_autoload_register(static function ($class) use ($npMap) {

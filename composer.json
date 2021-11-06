@@ -1,9 +1,9 @@
 {
-  "name": "phppkg/fasttpl",
+  "name": "phppkg/easytpl",
   "description": "⚡️ Simple and fast template engine for PHP",
   "type": "template",
   "license": "MIT",
-  "homepage": "https://github.com/phppkg/fasttpl",
+  "homepage": "https://github.com/phppkg/easytpl",
   "authors": [
     {
       "name": "inhere",
@@ -17,12 +17,12 @@
   },
   "autoload": {
     "psr-4": {
-      "PhpPkg\\FastTpl\\": "src/"
+      "PhpPkg\\EasyTpl\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "PhpPkg\\FastTplTest\\": "test/"
+      "PhpPkg\\EasyTplTest\\": "test/"
     }
   },
   "bin": [

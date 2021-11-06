@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpPkg\FastTplTest;
+namespace PhpPkg\EasyTplTest;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
