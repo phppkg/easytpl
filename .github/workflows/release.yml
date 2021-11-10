@@ -62,7 +62,7 @@ jobs:
         with:
           name: ${{ env.RELEASE_TAG }}
           tag_name: ${{ env.RELEASE_TAG }}
-           body_path: changelog.md
+          body_path: changelog.md
           # files: kite-${{ env.RELEASE_TAG }}.phar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

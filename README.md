@@ -1,11 +1,20 @@
 # EasyTpl
 
 [![License](https://img.shields.io/packagist/l/phppkg/easytpl.svg?style=flat-square)](LICENSE)
-[![Php Version](https://img.shields.io/badge/php-%3E=7.4.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
+[![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
 
-⚡️ Simple and fastly text template engine for PHP
+⚡️ Simple and fastly template engine for PHP
+
+## Features
+
+- it's simple and fastly
+- simple echo syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
+- support php builtin string function as filters. eg: `{{ $var | ucfirst }}`
+- support add custom filters.
+- support add custom directive. eg: `include` - `{{ include('other.tpl') }}`
+- support all syntax：`if,elseif,else;foreach;for;switch...`
 
 ## Install
 
@@ -15,13 +24,64 @@
 composer require phppkg/easytpl
 ```
 
-## Usage
+## Quick start
 
 ```php
-use PhpPkg\EasyTpl\FastTemplate;
+use PhpPkg\EasyTpl\EasyTemplate;
 
-$t = new FastTemplate();
-$t->parse();
+$t = new EasyTemplate();
+$t->renderString($tplCode);
+```
+
+## Custom directive
+
+You can use the directives implement some special logic.
+
+
+
+```php
+
+```
+
+## Using the filters
+
+You can use the filters in any of your templates.
+
+**Regular usage**:
+
+```php
+{{ 'john' | ucfirst }} // John
+```
+
+**Chained usage**:
+
+```php
+{{ 'john' | ucfirst | substr:0,1 }} // J
+{{ '1999-12-31' | date:'Y/m/d' }} // 1999/12/31
+```
+
+**Passing non-static values**:
+
+```php
+{{ $name | ucfirst | substr:0,1 }}
+{{ $user['name'] | ucfirst | substr:0,1 }}
+{{ $currentUser->name | ucfirst | substr:0,1 }}
+{{ getName() | ucfirst | substr:0,1 }}
+```
+
+**Passing variables as filter parameters**:
+
+```php
+$currency = 'HUF'
+{{ '12.75' | currency:$currency }} // HUF 12.75
+```
+
+**Built-in functionality**:
+
+```php
+{{ 'This is a title' | slug }} // this-is-a-title
+{{ 'This is a title' | title }} // This Is A Title
+{{ 'foo_bar' | studly }} // FooBar
 ```
 
 ## License

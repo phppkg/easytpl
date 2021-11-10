@@ -1,6 +1,6 @@
 {
   "name": "phppkg/easytpl",
-  "description": "⚡️ Simple and fast template engine for PHP",
+  "description": "⚡️ Simple and fastly template engine for PHP",
   "type": "template",
   "license": "MIT",
   "homepage": "https://github.com/phppkg/easytpl",
@@ -11,9 +11,10 @@
     }
   ],
   "require": {
-    "php": ">7.4.0",
+    "php": ">8.0",
     "ext-mbstring": "*",
-    "toolkit/cli-utils":"~1.0"
+    "toolkit/fsutil":"~1.0",
+    "toolkit/stdlib":"~1.0"
   },
   "autoload": {
     "psr-4": {
