@@ -7,14 +7,22 @@ use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
 use Throwable;
+use function dirname;
 
 /**
  * Class BaseTestCase
- *
- * @package Toolkit\PFlagTest
  */
 abstract class BaseTestCase extends TestCase
 {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function getTestTplFile(string $path): string
+    {
+        return __DIR__ . '/' . $path;
+    }
 
     /**
      * get method for test protected and private method
@@ -28,21 +36,21 @@ abstract class BaseTestCase extends TestCase
      * $res = $rftMth->invokeArgs($obj, $invokeArgs);
      * ```
      *
-     * @param string|object $class
+     * @param object|string $class
      * @param string $method
      *
      * @return ReflectionMethod
      * @throws ReflectionException
      */
-    protected static function getMethod($class, string $method): ReflectionMethod
+    protected static function getMethod(object|string $class, string $method): ReflectionMethod
     {
         // $class  = new \ReflectionClass($class);
-        // $method = $class->getMethod($method);
+        // $rftMth = $class->getMethod($method);
 
-        $method = new \ReflectionMethod($class, $method);
-        $method->setAccessible(true);
+        $rftMth = new \ReflectionMethod($class, $method);
+        $rftMth->setAccessible(true);
 
-        return $method;
+        return $rftMth;
     }
 
     /**

@@ -11,10 +11,11 @@
 
 - it's simple and fastly
 - simple echo syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
+- chained access array value syntax. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
 - support php builtin string function as filters. eg: `{{ $var | ucfirst }}`
+- support all control syntax. such as `if,elseif,else;foreach;for;switch`
 - support add custom filters.
-- support add custom directive. eg: `include` - `{{ include('other.tpl') }}`
-- support all syntax：`if,elseif,else;foreach;for;switch...`
+- support add custom directive.
 
 ## Install
 
@@ -33,17 +34,32 @@ $t = new EasyTemplate();
 $t->renderString($tplCode);
 ```
 
-## Custom directive
+## Custom directives
 
 You can use the directives implement some special logic.
 
+```php
+$tpl = EasyTemplate::new();
+$tpl->addDirective(
+    'include',
+    function (string $body, string $name) {
+        /** will call {@see EasyTemplate::include()} */
+        return '$this->' . $name . $body;
+    }
+);
+```
 
+In template can use:
 
 ```php
 
+{{ include('part/header.tpl', ['title' => 'My world']) }}
+
 ```
 
-## Using the filters
+### Filters
+
+### Using the filters
 
 You can use the filters in any of your templates.
 
@@ -72,8 +88,11 @@ You can use the filters in any of your templates.
 **Passing variables as filter parameters**:
 
 ```php
-$currency = 'HUF'
-{{ '12.75' | currency:$currency }} // HUF 12.75
+{{
+    $suffix = '￥';
+}}
+
+{{ '12.75' | add_suffix:$suffix }} // 12.75￥
 ```
 
 **Built-in functionality**:
@@ -82,6 +101,24 @@ $currency = 'HUF'
 {{ 'This is a title' | slug }} // this-is-a-title
 {{ 'This is a title' | title }} // This Is A Title
 {{ 'foo_bar' | studly }} // FooBar
+```
+
+### Custom filters
+
+```php
+use PhpPkg\EasyTpl\EasyTemplate;
+
+$tpl = EasyTemplate::new();
+// use php built function
+$tpl->addFilter('upper', 'strtoupper');
+
+// add more
+$tpl->addFilters([
+    'last3chars' => function (string $str): string {
+        return substr($str, -3);
+    },
+]);
+
 ```
 
 ## License
