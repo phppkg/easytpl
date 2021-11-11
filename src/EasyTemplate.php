@@ -7,7 +7,10 @@ use PhpPkg\EasyTpl\Contract\CompilerInterface;
 use PhpPkg\EasyTpl\Contract\EasyTemplateInterface;
 use InvalidArgumentException;
 use Toolkit\FsUtil\File;
+use function file_exists;
+use function file_get_contents;
 use function is_string;
+use function md5;
 
 /**
  * Class EasyTemplate
@@ -27,7 +30,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     private CompilerInterface $compiler;
 
     /**
-     * custom filter for handle result(only for echo body).
+     * Custom filter for handle result(only for echo body).
      *
      * ```php
      * $p->addFilter('upper', 'strtoupper');
@@ -150,12 +153,16 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     public function compileFile(string $tplFile): string
     {
         $tplFile = $this->findTplFile($tplFile);
+        $tplCode = file_get_contents($tplFile);
+        $tmpFile = $this->tmpFilepath(md5($tplCode), File::getName($tplFile, true));
 
-        // compile contents
-        $phpCode = $this->compiler->compileFile($tplFile);
+        // only compile on cached tmp file not exists
+        if (!file_exists($tmpFile)) {
+            $phpCode = $this->compiler->compile($tplCode);
+            $tmpFile = $this->genTmpPhpFile($phpCode, $tmpFile);
+        }
 
-        // generate temp php file
-        return $this->genTmpPhpFile($phpCode, File::getName($tplFile, true));
+        return $tmpFile;
     }
 
     /**
@@ -199,7 +206,6 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
         foreach ($filters as $name => $filterFn) {
             $this->addFilter($name, $filterFn);
         }
-
         return $this;
     }
 
@@ -272,17 +278,6 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     public function setOpenCloseTag(string $open, string $close): self
     {
         $this->getCompiler()->setOpenCloseTag($open, $close);
-        return $this;
-    }
-
-    /**
-     * @param CompilerInterface $compiler
-     *
-     * @return EasyTemplate
-     */
-    public function setCompiler(CompilerInterface $compiler): self
-    {
-        $this->compiler = $compiler;
         return $this;
     }
 

@@ -8,6 +8,8 @@ use Throwable;
 use Toolkit\FsUtil\Dir;
 use Toolkit\Stdlib\OS;
 use function array_merge;
+use function date;
+use function dirname;
 use function extract;
 use function file_exists;
 use function file_put_contents;
@@ -17,7 +19,6 @@ use function ob_get_clean;
 use function ob_start;
 use function sprintf;
 use const EXTR_OVERWRITE;
-use const PHP_EOL;
 
 /**
  * Class PhpTemplate
@@ -83,7 +84,6 @@ class PhpTemplate extends AbstractTemplate
         ob_start();
         extract($tplVars, EXTR_OVERWRITE);
         try {
-            // require \BASE_PATH . '/runtime/go-snippets-0709.tpl.php';
             require $tplFile;
             return ob_get_clean();
         } catch (Throwable $e) {
@@ -93,30 +93,45 @@ class PhpTemplate extends AbstractTemplate
     }
 
     /**
-     * Generate tmp php template file
-     *
-     * @param string $phpCode
+     * @param string $hashId template contents hashID
      * @param string $prefix
      *
      * @return string
      */
-    protected function genTmpPhpFile(string $phpCode, string $prefix = ''): string
+    protected function tmpFilepath(string $hashId, string $prefix = ''): string
     {
-        $tmpDir = $this->tmpDir ?: OS::getTempDir() . '/php-tpl-code';
-        $prefix = $prefix ?: 'phpTpl';
-        $tmpFile = sprintf('%s/%s_%s.php', $tmpDir, $prefix, md5($phpCode));
+        $prefix  = $prefix ?: 'phpTpl';
+        $tmpDir  = $this->tmpDir ?: OS::getTempDir() . '/php-tpl-code';
+        $tmpFile = sprintf('%s/%s_%s.php', $tmpDir, $prefix, $hashId);
+
+        $this->tmpPhpFile = $tmpFile;
+        return $tmpFile;
+    }
+
+    /**
+     * Generate tmp php template file
+     *
+     * @param string $phpCode
+     * @param string $tmpFile
+     *
+     * @return string
+     */
+    protected function genTmpPhpFile(string $phpCode, string $tmpFile = ''): string
+    {
+        if (!$tmpFile) {
+            $tmpFile = $this->tmpFilepath(md5($phpCode));
+        }
 
         if (!file_exists($tmpFile)) {
-            Dir::create($tmpDir);
+            Dir::create(dirname($tmpFile));
 
-            // write contents
-            $num = file_put_contents($tmpFile, $phpCode . PHP_EOL);
+            $date = date('Y/m/d H:i:s');
+            $num = file_put_contents($tmpFile, $phpCode . "\n<?php // generated on $date ?>");
             if ($num < 1) {
-                throw new RuntimeException('write template contents to temp file error');
+                throw new RuntimeException('write contents to tmp file failed');
             }
         }
 
-        $this->tmpPhpFile = $tmpFile;
         return $tmpFile;
     }
 
