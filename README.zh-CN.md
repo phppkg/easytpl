@@ -5,23 +5,22 @@
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
 
-⚡️ Simple and fastly template engine for PHP
+⚡️ 简单快速的 PHP 模板引擎
 
-> **[中文说明](README.zh-CN.md)**
+> **[EN-README](README.md)**
 
-## Features
+## 功能特性 
+- 简单、轻量且快速。
+  - 仅仅简单处理并转换为原生PHP语法
+- 支持简单的输出语法。 例如：`{{= $var }}` `{{ $var }}` `{{ echo $var }}`
+- 支持所有控制语法。 如 `if,elseif,else;foreach;for;switch`
+- 支持链式访问数组值。 例如：`{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
+- 支持使用 PHP 内置函数作为过滤器。 例如：`{{ $var | ucfirst }}`
+- 支持添加自定义过滤器
+  - 默认内置过滤器：`upper` `lower` `nl`
+- 支持添加自定义指令
 
-- It's simple, lightweight and fastly. 
-  - It is simply processed and converted into native PHP syntax
-- support simple echo print syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
-- support chained access array value. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
-- support php builtin function as filters. eg: `{{ $var | ucfirst }}`
-- support all control syntax. such as `if,elseif,else;foreach;for;switch`
-- support add custom filters.
-  - default builtin filters: `upper` `lower` `nl`
-- support add custom directive.
-
-## Install
+## 安装
 
 **composer**
 
@@ -29,7 +28,7 @@
 composer require phppkg/easytpl
 ```
 
-## Quick start
+## 快速开始
 
 ```php
 use PhpPkg\EasyTpl\EasyTemplate;
@@ -76,39 +75,39 @@ $arr = [
 ];
 ```
 
-Use in template:
+在模板中使用:
 
 ```php
 First value is: {{ $arr.0 }}
 'subKey' value is: {{ $arr.subKey }}
 ```
 
-## Use Filters
+## 使用过滤器
 
-Default built-in filters: 
+默认内置过滤器:
 
-- `upper` - equals `strtoupper`
-- `lower` - equals `strtolower`
-- `nl` - append newline `\n`
+- `upper` - 等同于 `strtoupper`
+- `lower` - 等同于 `strtolower`
+- `nl`    - 追加换行符 `\n`
 
-### Using the filters
+### 过滤器使用示例
 
-You can use the filters in any of your templates.
+您可以在任何模板中使用过滤器。
 
-**Regular usage**:
+**基本使用**:
 
 ```php
 {{ 'john' | ucfirst }} // John
 ```
 
-**Chained usage**:
+**链式使用**:
 
 ```php
 {{ 'john' | ucfirst | substr:0,1 }} // J
 {{ '1999-12-31' | date:'Y/m/d' }} // 1999/12/31
 ```
 
-**Passing non-static values**:
+**传递非静态值**:
 
 ```php
 {{ $name | ucfirst | substr:0,1 }}
@@ -117,7 +116,7 @@ You can use the filters in any of your templates.
 {{ getName() | ucfirst | substr:0,1 }}
 ```
 
-**Passing variables as filter parameters**:
+**将变量作为过滤器参数传递**:
 
 ```php
 {{
@@ -127,7 +126,7 @@ You can use the filters in any of your templates.
 {{ '12.75' | add_suffix:$suffix }} // 12.75￥
 ```
 
-### Custom filters
+### 自定义过滤器
 
 ```php
 use PhpPkg\EasyTpl\EasyTemplate;
@@ -144,7 +143,7 @@ $tpl->addFilters([
 ]);
 ```
 
-Use in template:
+在模板中使用:
 
 ```php
 {{
@@ -156,9 +155,9 @@ Use in template:
 {{ $name | last3chars | upper }} // Output: ERE
 ```
 
-## Custom directives
+## 自定义指令
 
-You can use the directives implement some special logic.
+您可以使用指令实现一些特殊的逻辑。
 
 ```php
 $tpl = EasyTemplate::new();
@@ -171,7 +170,7 @@ $tpl->addDirective(
 );
 ```
 
-Use in template:
+在模板中使用:
 
 ```php
 
