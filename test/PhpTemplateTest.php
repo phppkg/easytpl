@@ -22,4 +22,23 @@ class PhpTemplateTest extends BaseTestCase
         $this->assertNotEmpty($result);
         $this->assertStringNotContainsString('<?', $result);
     }
+
+    public function testRenderFile_tplDir():void
+    {
+        $t = PhpTemplate::new();
+
+        $tplFile = 'gen-go-funcs.php';
+        $tplVars = ['vars' => ['Info', 'Error', 'Warn']];
+
+        $e = $this->runAndGetException(function (PhpTemplate $t, $tplFile, $tplVars) {
+            $t->renderFile($tplFile, $tplVars);
+        }, $t, $tplFile, $tplVars);
+        $this->assertEquals('no such template file: gen-go-funcs.php', $e->getMessage());
+
+        $t->setTplDir(__DIR__ . '/testdata');
+        $result = $t->renderFile($tplFile, $tplVars);
+        vdump($result);
+        $this->assertNotEmpty($result);
+        $this->assertStringNotContainsString('<?', $result);
+    }
 }

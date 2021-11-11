@@ -10,6 +10,7 @@ use function is_numeric;
 use function preg_match;
 use function preg_replace_callback;
 use function str_contains;
+use function str_ends_with;
 use function strlen;
 use function substr;
 use function trim;
@@ -86,7 +87,6 @@ class PregCompiler extends AbstractCompiler
      * parse code block string.
      *
      * - '=': echo
-     * - '-': trim
      * - 'if'
      * - 'for'
      * - 'foreach'
@@ -98,13 +98,19 @@ class PregCompiler extends AbstractCompiler
      */
     public function parseCodeBlock(string $block): string
     {
+        // empty line, keep it.
         if (!$trimmed = trim($block)) {
             return $block;
         }
 
-        // special '}' -  if, for, foreach end char
+        // special '}' -  end char for `if, for, foreach, switch`
         if ($trimmed === '}') {
             return self::PHP_TAG_OPEN . ' } ' . self::PHP_TAG_CLOSE;
+        }
+
+        // comments block. `{{# comments #}}`
+        if ($block[0] === '#' && str_ends_with($block, '#')) {
+            return '';
         }
 
         $isInline = !str_contains($trimmed, "\n");

@@ -20,9 +20,12 @@
 - 支持使用 PHP 内置函数作为过滤器。 例如：`{{ $var | ucfirst }}`
 - 支持添加自定义过滤器
   - 默认内置过滤器：`upper` `lower` `nl`
-- 支持添加自定义指令
+- 支持添加自定义指令，提供自定义功能
+- 支持模板中添加注释。 例如: `{{# comments ... #}}`
 
 ## 安装
+
+- 需要 PHP 8.0+
 
 **composer**
 
@@ -97,6 +100,24 @@ $arr = [
 ```php
 first value is: {{ $arr.0 }} // val0
 'subKey' value is: {{ $arr.subKey }} // val1
+```
+
+**模板中添加注释**
+
+以 `{{# XX  #}}` 包裹的内容将会当做注释忽略
+
+```text
+{{# comments ... #}}{{ $name }} // inhere
+```
+
+multi lines:
+
+```text
+{{#
+ this
+ comments
+ block
+#}}{{ $name }} // inhere
 ```
 
 ## 使用过滤器

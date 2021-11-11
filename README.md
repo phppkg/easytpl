@@ -21,8 +21,11 @@
 - support add custom filters.
   - default builtin filters: `upper` `lower` `nl`
 - support add custom directive.
+- support comments in templates. eg: `{{# comments ... #}}`
 
 ## Install
+
+- Required PHP 8.0+
 
 **composer**
 
@@ -95,8 +98,24 @@ $arr = [
 Use in template:
 
 ```php
-First value is: {{ $arr.0 }}
-'subKey' value is: {{ $arr.subKey }}
+First value is: {{ $arr.0 }} // val0
+'subKey' value is: {{ $arr.subKey }} // val1
+```
+
+**add comments**
+
+```text
+{{# comments ... #}}{{ $name }} // inhere
+```
+
+multi lines:
+
+```text
+{{#
+ this
+ comments
+ block
+#}}{{ $name }} // inhere
 ```
 
 ## Use Filters

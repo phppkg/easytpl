@@ -146,6 +146,29 @@ CODE
         }
     }
 
+    public function testCompile_comments():void
+    {
+        $p = new PregCompiler();
+        $p->disableEchoFilter();
+
+        $tests = [
+            ['{{# echo "ab" #}}', ''],
+            ['{{# 
+         multi
+         line
+        comments     #}}hi', 'hi'],
+            [
+                '{{# comments #}}{{ $name ?: "inhere" | substr:0,3 }}',
+                '<?= substr($name ?: "inhere", 0,3) ?>'
+            ],
+            // invalid
+            ['{{# echo "ab" # }}', '<?= # echo "ab" # ?>'],
+        ];
+        foreach ($tests as [$in, $out]) {
+            $this->assertEquals($out, $p->compile($in));
+        }
+    }
+
     public function testCompile_customDirective():void
     {
         $p = new PregCompiler();
