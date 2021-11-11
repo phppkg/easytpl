@@ -21,6 +21,8 @@ class TextTemplate extends EasyTemplate
      */
     protected function init(CompilerInterface $compiler): void
     {
+        parent::init($compiler);
+
         // use raw echo for text template
         $compiler->disableEchoFilter();
     }
