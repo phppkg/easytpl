@@ -112,13 +112,14 @@ You can use the filters in any of your templates.
 **Regular usage**:
 
 ```php
-{{ 'john' | ucfirst }} // John
+{{ 'inhere' | ucfirst }} // Inhere 
+{{ 'inhere' | upper }} // INHERE
 ```
 
 **Chained usage**:
 
 ```php
-{{ 'john' | ucfirst | substr:0,1 }} // J
+{{ 'inhere' | ucfirst | substr:0,2 }} // In
 {{ '1999-12-31' | date:'Y/m/d' }} // 1999/12/31
 ```
 
@@ -128,7 +129,7 @@ You can use the filters in any of your templates.
 {{ $name | ucfirst | substr:0,1 }}
 {{ $user['name'] | ucfirst | substr:0,1 }}
 {{ $userObj->name | ucfirst | substr:0,1 }}
-{{ getName() | ucfirst | substr:0,1 }}
+{{ $userObj->getName() | ucfirst | substr:0,1 }}
 ```
 
 **Passing variables as filter parameters**:
@@ -165,9 +166,9 @@ Use in template:
   $name = 'inhere';
 }}
 
-{{ $name | upper }} // Output: INHERE
-{{ $name | last3chars }} // Output: ere
-{{ $name | last3chars | upper }} // Output: ERE
+{{ $name | upper }} // INHERE
+{{ $name | last3chars }} // ere
+{{ $name | last3chars | upper }} // ERE
 ```
 
 ## Custom directives
