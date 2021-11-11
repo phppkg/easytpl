@@ -38,7 +38,7 @@ use PhpPkg\EasyTpl\EasyTemplate;
 $tplCode = <<<'CODE'
 My name is {{ $name | strtoupper }},
 My develop tags:
-{{ foreach($tags => $tag) }}
+{{ foreach($tags as $tag) }}
 - {{ $tag }}
 
 {{ endforeach }}
