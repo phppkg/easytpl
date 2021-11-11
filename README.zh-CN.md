@@ -1,6 +1,6 @@
 # EasyTpl
 
-[![License](https://img.shields.io/packagist/l/phppkg/easytpl.svg?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/github/license/phppkg/easytpl.svg?style=flat-square)](LICENSE)
 [![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
@@ -9,9 +9,11 @@
 
 > **[EN-README](README.md)**
 
-## 功能特性 
+## 功能特性
+
 - 简单、轻量且快速。
   - 仅仅简单处理并转换为原生PHP语法
+  - 兼容PHP原生语法使用
 - 支持简单的输出语法。 例如：`{{= $var }}` `{{ $var }}` `{{ echo $var }}`
 - 支持所有控制语法。 如 `if,elseif,else;foreach;for;switch`
 - 支持链式访问数组值。 例如：`{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
@@ -52,7 +54,7 @@ $str = $t->renderString($tplCode, [
 echo $str;
 ```
 
-**Output**:
+**渲染输出**:
 
 ```text
 My name is INHERE,
@@ -62,11 +64,24 @@ My develop tags:
 - java
 ```
 
-### More usage
+### 更多使用
 
-**chained access array**
+**配置设置**
 
-Use `.` access array value.
+```php
+use PhpPkg\EasyTpl\EasyTemplate;
+
+$t = EasyTemplate::new([
+    'tplDir' => 'path/to/templates',
+    'allowExt' => ['.php', '.tpl'],
+]);
+
+// do something ...
+```
+
+**快速访问数组值**
+
+可以使用`.` 来快速访问数组值。
 
 ```php
 $arr = [
@@ -78,8 +93,8 @@ $arr = [
 在模板中使用:
 
 ```php
-First value is: {{ $arr.0 }}
-'subKey' value is: {{ $arr.subKey }}
+first value is: {{ $arr.0 }} // val0
+'subKey' value is: {{ $arr.subKey }} // val1
 ```
 
 ## 使用过滤器
@@ -97,13 +112,14 @@ First value is: {{ $arr.0 }}
 **基本使用**:
 
 ```php
-{{ 'john' | ucfirst }} // John
+{{ 'inhere' | ucfirst }} // Inhere 
+{{ 'inhere' | upper }} // INHERE
 ```
 
 **链式使用**:
 
 ```php
-{{ 'john' | ucfirst | substr:0,1 }} // J
+{{ 'inhere' | ucfirst | substr:0,2 }} // In
 {{ '1999-12-31' | date:'Y/m/d' }} // 1999/12/31
 ```
 
@@ -113,7 +129,7 @@ First value is: {{ $arr.0 }}
 {{ $name | ucfirst | substr:0,1 }}
 {{ $user['name'] | ucfirst | substr:0,1 }}
 {{ $userObj->name | ucfirst | substr:0,1 }}
-{{ getName() | ucfirst | substr:0,1 }}
+{{ $userObj->getName() | ucfirst | substr:0,1 }}
 ```
 
 **将变量作为过滤器参数传递**:
@@ -150,9 +166,9 @@ $tpl->addFilters([
   $name = 'inhere';
 }}
 
-{{ $name | upper }} // Output: INHERE
-{{ $name | last3chars }} // Output: ere
-{{ $name | last3chars | upper }} // Output: ERE
+{{ $name | upper }} // INHERE
+{{ $name | last3chars }} // ere
+{{ $name | last3chars | upper }} // ERE
 ```
 
 ## 自定义指令

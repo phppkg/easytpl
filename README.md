@@ -1,6 +1,6 @@
 # EasyTpl
 
-[![License](https://img.shields.io/packagist/l/phppkg/easytpl.svg?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/github/license/phppkg/easytpl.svg?style=flat-square)](LICENSE)
 [![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
@@ -13,6 +13,7 @@
 
 - It's simple, lightweight and fastly. 
   - It is simply processed and converted into native PHP syntax
+  - Compatible with PHP native syntax
 - support simple echo print syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
 - support chained access array value. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
 - support php builtin function as filters. eg: `{{ $var | ucfirst }}`
@@ -65,9 +66,22 @@ My develop tags:
 
 ### More usage
 
+**config template**
+
+```php
+use PhpPkg\EasyTpl\EasyTemplate;
+
+$t = EasyTemplate::new([
+    'tplDir'   => 'path/to/templates',
+    'allowExt' => ['.php', '.tpl'],
+]);
+
+// do something ...
+```
+
 **chained access array**
 
-Use `.` access array value.
+Can use `.` to quick access array value.
 
 ```php
 $arr = [

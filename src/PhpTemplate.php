@@ -27,7 +27,7 @@ use const PHP_EOL;
 class PhpTemplate extends AbstractTemplate
 {
     /**
-     * The tmp dir for auto generated temp php file
+     * The cache dir for generated temp php file
      *
      * @var string
      */

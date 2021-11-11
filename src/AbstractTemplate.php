@@ -18,7 +18,7 @@ use function strpos;
 abstract class AbstractTemplate implements TemplateInterface
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected array $globalVars = [];
 
@@ -49,7 +49,7 @@ abstract class AbstractTemplate implements TemplateInterface
     public $pathResolver;
 
     /**
-     * @param array $config
+     * @param array{tplDir: string, allowExt: array, globalVars: array} $config
      *
      * @return static
      */
