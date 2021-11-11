@@ -30,13 +30,15 @@ abstract class AbstractTemplate implements TemplateInterface
     protected array $allowExt = ['.php', '.tpl'];
 
     /**
-     * manual set view files
+     * manual set template files
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected array $tplFiles = [];
+    public array $tplFiles = [];
 
     /**
+     * template files dir.
+     *
      * @var string
      */
     public string $tplDir = '';
@@ -47,6 +49,13 @@ abstract class AbstractTemplate implements TemplateInterface
      * @var callable(string): string
      */
     public $pathResolver;
+
+    /**
+     * Current rendering tpl file by {@see findTplFile()}
+     *
+     * @var string
+     */
+    protected string $curTplFile = '';
 
     /**
      * @param array{tplDir: string, allowExt: array, globalVars: array} $config
@@ -85,8 +94,6 @@ abstract class AbstractTemplate implements TemplateInterface
      */
     public function render(string $tplFile, array $tplVars = []): void
     {
-        $tplFile = $this->findTplFile($tplFile);
-
         echo $this->renderFile($tplFile, $tplVars);
     }
 
@@ -239,5 +246,13 @@ abstract class AbstractTemplate implements TemplateInterface
     {
         $this->pathResolver = $pathResolver;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurTplFile(): string
+    {
+        return $this->curTplFile;
     }
 }

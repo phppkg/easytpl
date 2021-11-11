@@ -62,6 +62,8 @@ class PhpTemplate extends AbstractTemplate
      */
     public function renderFile(string $tplFile, array $tplVars = []): string
     {
+        $this->curTplFile = $tplFile = $this->findTplFile($tplFile);
+
         return $this->doRenderFile($tplFile, $tplVars);
     }
 

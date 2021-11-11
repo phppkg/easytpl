@@ -68,6 +68,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
 
         parent::__construct($config);
 
+        // init
         $this->init($this->compiler);
     }
 
@@ -122,6 +123,8 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     }
 
     /**
+     * Include render file and output result
+     *
      * @param string $tplFile
      * @param array $tplVars
      */
@@ -134,25 +137,12 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
 
     /**
      * @param string $tplFile
-     * @param array $tplVars
-     *
-     * @return string
-     */
-    protected function renderInclude(string $tplFile, array $tplVars): string
-    {
-        $phpFile = $this->compileFile($tplFile);
-
-        return $this->doRenderFile($phpFile, $tplVars);
-    }
-
-    /**
-     * @param string $tplFile
      *
      * @return string
      */
     public function compileFile(string $tplFile): string
     {
-        $tplFile = $this->findTplFile($tplFile);
+        $tplFile = $this->curTplFile = $this->findTplFile($tplFile);
         $tplCode = file_get_contents($tplFile);
         $tmpFile = $this->tmpFilepath(md5($tplCode), File::getName($tplFile, true));
 

@@ -4,7 +4,7 @@ namespace PhpPkg\EasyTpl;
 
 use InvalidArgumentException;
 use function array_merge;
-use function file_exists;
+use function explode;
 use function file_get_contents;
 use function sprintf;
 use function str_contains;
@@ -26,6 +26,11 @@ class SimpleTemplate extends AbstractTemplate
     protected string $format = '{{%s}}';
 
     /**
+     * @var string
+     */
+    private string $formatLeft = '{{';
+
+    /**
      * @param string $tplFile
      * @param array  $tplVars
      *
@@ -33,10 +38,7 @@ class SimpleTemplate extends AbstractTemplate
      */
     public function renderFile(string $tplFile, array $tplVars = []): string
     {
-        if (!file_exists($tplFile)) {
-            throw new InvalidArgumentException('No such template file:' . $tplFile);
-        }
-
+        $tplFile = $this->curTplFile = $this->findTplFile($tplFile);
         $tplCode = file_get_contents($tplFile);
 
         return $this->renderString($tplCode, $tplVars);
@@ -50,6 +52,10 @@ class SimpleTemplate extends AbstractTemplate
      */
     public function renderString(string $tplCode, array $tplVars = []): string
     {
+        if (!str_contains($tplCode, $this->formatLeft)) {
+            return $tplCode;
+        }
+
         if ($this->globalVars) {
             $tplVars = array_merge($this->globalVars, $tplVars);
         }
@@ -82,5 +88,8 @@ class SimpleTemplate extends AbstractTemplate
         }
 
         $this->format = $format;
+        // get left chars
+        [$left, ] = explode('%s', $format);
+        $this->formatLeft = $left;
     }
 }
