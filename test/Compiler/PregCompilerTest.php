@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpPkg\EasyTplTest;
+namespace PhpPkg\EasyTplTest\Compiler;
 
 use PhpPkg\EasyTpl\Compiler\PregCompiler;
 use PhpPkg\EasyTpl\Compiler\Token;
+use PhpPkg\EasyTplTest\BaseTestCase;
 use function preg_match;
 
 /**
@@ -117,10 +118,10 @@ CODE
 
         $tests = [
             ['{{ "a" . "b" }}', '<?= "a" . "b" ?>'],
-            ['{{ $name | ucfirst }}', '<?= ucfirst(htmlspecialchars($name)) ?>'],
+            ['{{ $name | ucfirst }}', '<?= htmlspecialchars((string)ucfirst($name)) ?>'],
             [
                 '{{ $name ?: "inhere" | substr:0,3 }}',
-                '<?= substr(htmlspecialchars($name ?: "inhere"), 0,3) ?>'
+                '<?= htmlspecialchars((string)substr($name ?: "inhere", 0,3)) ?>'
             ],
             ['{{ some_func() | raw }}', '<?= some_func() ?>'],
             ['{{ $this->include("header.tpl") }}', '<?= $this->include("header.tpl") ?>'],

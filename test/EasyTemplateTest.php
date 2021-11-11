@@ -110,7 +110,16 @@ class EasyTemplateTest extends BaseTestCase
         $this->assertEquals("\nMyPKG\n", $result);
     }
 
-    public function testAddFilters(): void
+    public function testPhpFuncAsFilter_compile_render(): void
+    {
+        $t = new EasyTemplate();
+
+        $code = '{{ 34.5 | ceil }}';
+        $this->assertEquals('<?= htmlspecialchars((string)ceil(34.5)) ?>', $t->compileCode($code));
+        $this->assertEquals('35', $t->renderString($code, []));
+    }
+
+    public function testAddFilters_compile_render(): void
     {
         $t = new EasyTemplate();
         $t->addFilters([
@@ -121,20 +130,29 @@ class EasyTemplateTest extends BaseTestCase
         ]);
 
         $code = '{{ $name | upper }}';
-        $out = '<?= strtoupper(htmlspecialchars($name)) ?>';
+        $out = '<?= htmlspecialchars((string)strtoupper($name)) ?>';
         $this->assertEquals($out, $t->compileCode($code));
+        $this->assertEquals('INHERE', $t->renderString($code, [
+            'name' => 'inhere',
+        ]));
 
         $code = '{{ $name | myFilter }}';
         $out = <<<'CODE'
-<?= $this->applyFilter('myFilter', htmlspecialchars($name)) ?>
+<?= htmlspecialchars((string)$this->applyFilter('myFilter', $name)) ?>
 CODE;
         $this->assertEquals($out, $t->compileCode($code));
+        $this->assertEquals('ere', $t->renderString($code, [
+            'name' => 'inhere',
+        ]));
 
         $code = '{{ $name | upper | myFilter }}';
         $out = <<<'CODE'
-<?= $this->applyFilter('myFilter', strtoupper(htmlspecialchars($name))) ?>
+<?= htmlspecialchars((string)$this->applyFilter('myFilter', strtoupper($name))) ?>
 CODE;
         $this->assertEquals($out, $t->compileCode($code));
+        $this->assertEquals('ERE', $t->renderString($code, [
+            'name' => 'inhere',
+        ]));
     }
 
     public function testAddFilter_setFilterSep(): void
@@ -150,8 +168,23 @@ CODE;
 
         // goods
         $code = '{{ $name | upper }}';
-        $out = '<?= strtoupper(htmlspecialchars($name)) ?>';
+        $out = '<?= htmlspecialchars((string)strtoupper($name)) ?>';
         $this->assertEquals($out, $t->compileCode($code));
+    }
+
+    public function testRender_define(): void
+    {
+        $t = new EasyTemplate();
+
+        $tplCode = <<<'CODE'
+{{
+  $name = 'inhere';
+}}
+{{ $name | upper }}
+CODE;
+        $result = $t->renderString($tplCode);
+        $this->assertNotEmpty($result);
+        $this->assertEquals('INHERE', $result);
     }
 
     public function testRenderFile_ifElse(): void
@@ -160,7 +193,6 @@ CODE;
 
         $tplFile = $this->getTestTplFile('testdata/gen-go-funcs2.tpl');
         $tplVars = ['vars' => ['Info', 'Error', 'Warn']];
-        vdump($tplFile);
 
         $result = $t->renderFile($tplFile, $tplVars);
         $this->assertNotEmpty($result);
@@ -168,10 +200,34 @@ CODE;
         vdump($result);
     }
 
-    public function testRenderFile_foreach(): void
+    public function testRender_foreach(): void
     {
         $t = new EasyTemplate();
 
+        $tplCode = <<<'CODE'
+My name is {{ $name | strtoupper }},
+My develop tags:
+{{ foreach($tags as $tag) }}
+- {{ $tag }}
+
+{{ endforeach }}
+CODE;
+
+        $result = $t->renderString($tplCode, [
+            'name' => 'inhere',
+            'tags' => ['php', 'go', 'java'],
+        ]);
+        $this->assertNotEmpty($result);
+        $this->assertEquals('My name is INHERE,
+My develop tags:
+- php
+- go
+- java
+', $result);
+
+        vdump($result);
+
+        // render file
         $tplFile = $this->getTestTplFile('testdata/gen-go-funcs2.tpl');
         $tplVars = ['vars' => ['Info', 'Error', 'Warn']];
 

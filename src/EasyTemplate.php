@@ -45,14 +45,44 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     /**
      * Class constructor.
      *
-     * @param array $config
+     * @param array{compiler: class-string|CompilerInterface} $config
      */
     public function __construct(array $config = [])
     {
+        if (isset($config['compiler'])) {
+            $customCompiler = $config['compiler'];
+            // class-string
+            if (is_string($customCompiler)) {
+                $customCompiler = new $customCompiler;
+            }
+
+            $this->compiler = $customCompiler;
+            unset($config['compiler']);
+        } else {
+            $this->compiler = new PregCompiler();
+        }
+
         parent::__construct($config);
 
-        $this->compiler = new PregCompiler();
-        $this->compiler->addDirective(
+        $this->init($this->compiler);
+    }
+
+    /**
+     * @param CompilerInterface $compiler
+     */
+    protected function init(CompilerInterface $compiler): void
+    {
+        // add built-in filters
+        $this->addFilters([
+            'upper' => 'strtoupper',
+            'lower' => 'strtolower',
+            'nl'    => function ($str): string {
+                return $str . "\n";
+            },
+        ]);
+
+        // add directive: include
+        $compiler->addDirective(
             'include',
             function (string $body, string $name) {
                 /** will call {@see include()} */
@@ -67,7 +97,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
      *
      * @return string
      */
-    public function renderFile(string $tplFile, array $tplVars): string
+    public function renderFile(string $tplFile, array $tplVars = []): string
     {
         $phpFile = $this->compileFile($tplFile);
 
@@ -80,7 +110,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
      *
      * @return string
      */
-    public function renderString(string $tplCode, array $tplVars): string
+    public function renderString(string $tplCode, array $tplVars = []): string
     {
         $tplCode = $this->compiler->compile($tplCode);
 

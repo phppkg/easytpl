@@ -2,7 +2,6 @@
 
 namespace PhpPkg\EasyTpl\Compiler;
 
-use Toolkit\FsUtil\File;
 use function addslashes;
 use function array_keys;
 use function explode;
@@ -48,18 +47,6 @@ class PregCompiler extends AbstractCompiler
         $this->closeTagE = addslashes($close);
 
         return $this;
-    }
-
-    /**
-     * @param string $tplFile
-     *
-     * @return string
-     */
-    public function compileFile(string $tplFile): string
-    {
-        $tplCode = File::readAll($tplFile);
-
-        return $this->compile($tplCode);
     }
 
     /**

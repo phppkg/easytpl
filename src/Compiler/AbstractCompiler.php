@@ -3,6 +3,7 @@
 namespace PhpPkg\EasyTpl\Compiler;
 
 use PhpPkg\EasyTpl\Contract\CompilerInterface;
+use Toolkit\FsUtil\File;
 use Toolkit\Stdlib\Str;
 use function array_shift;
 use function explode;
@@ -15,7 +16,6 @@ use function is_int;
 use function sprintf;
 use function str_contains;
 use function strlen;
-use function vdump;
 
 /**
  * class AbstractCompiler
@@ -83,6 +83,18 @@ abstract class AbstractCompiler implements CompilerInterface
     }
 
     /**
+     * @param string $tplFile
+     *
+     * @return string
+     */
+    public function compileFile(string $tplFile): string
+    {
+        $tplCode = File::readAll($tplFile);
+
+        return $this->compile($tplCode);
+    }
+
+    /**
      * @param string $echoBody
      *
      * @return string
@@ -95,15 +107,6 @@ abstract class AbstractCompiler implements CompilerInterface
 
         $filters = Str::explode($echoBody, $this->filterSep);
         $newExpr = array_shift($filters);
-
-        $coreFn = $this->echoFilterFunc;
-        if (
-            $coreFn
-            && $coreFn !== self::RAW_OUTPUT
-            && !in_array(self::RAW_OUTPUT, $filters, true)
-        ) {
-            $newExpr = sprintf('%s(%s)', $coreFn, $newExpr);
-        }
 
         foreach ($filters as $filter) {
             if ($filter === self::RAW_OUTPUT) {
@@ -137,6 +140,15 @@ abstract class AbstractCompiler implements CompilerInterface
                 $filter  = $this->filterMapping[$filter] ?? $filter . '(';
                 $newExpr = sprintf('%s%s)', $filter, $newExpr);
             }
+        }
+
+        $coreFn = $this->echoFilterFunc;
+        if (
+            $coreFn
+            && $coreFn !== self::RAW_OUTPUT
+            && !in_array(self::RAW_OUTPUT, $filters, true)
+        ) {
+            $newExpr = sprintf('%s((string)%s)', $coreFn, $newExpr);
         }
 
         return $newExpr;

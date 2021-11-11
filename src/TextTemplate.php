@@ -2,6 +2,8 @@
 
 namespace PhpPkg\EasyTpl;
 
+use PhpPkg\EasyTpl\Contract\CompilerInterface;
+
 /**
  * class TextTemplate
  *
@@ -15,15 +17,11 @@ class TextTemplate extends EasyTemplate
     protected array $allowExt = ['.php', '.tpl'];
 
     /**
-     * Class constructor.
-     *
-     * @param array $config
+     * @param CompilerInterface $compiler
      */
-    public function __construct(array $config = [])
+    protected function init(CompilerInterface $compiler): void
     {
-        parent::__construct($config);
-
         // use raw echo for text template
-        $this->getCompiler()->disableEchoFilter();
+        $compiler->disableEchoFilter();
     }
 }

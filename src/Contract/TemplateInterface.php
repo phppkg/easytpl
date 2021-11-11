@@ -28,7 +28,7 @@ interface TemplateInterface
      *
      * @return string
      */
-    public function renderFile(string $tplFile, array $tplVars): string;
+    public function renderFile(string $tplFile, array $tplVars = []): string;
 
     /**
      * Render template text to string
@@ -38,5 +38,5 @@ interface TemplateInterface
      *
      * @return string
      */
-    public function renderString(string $tplCode, array $tplVars): string;
+    public function renderString(string $tplCode, array $tplVars = []): string;
 }

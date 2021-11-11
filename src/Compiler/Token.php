@@ -76,6 +76,18 @@ class Token
     ];
 
     /**
+     * will auto add char `:` on statement end.
+     */
+    public const CAN_FIX_TOKENS = [
+        self::T_IF,
+        self::T_ELSEIF,
+        self::T_ELSE,
+        self::T_FOREACH,
+        self::T_CASE,
+        self::T_SWITCH
+    ];
+
+    /**
      * @return string
      */
     public static function getBlockNamePattern(): string
@@ -125,10 +137,6 @@ class Token
      */
     public static function canAutoFixed(string $type): bool
     {
-        return in_array(
-            $type,
-            [self::T_IF, self::T_ELSEIF, self::T_ELSE, self::T_FOREACH, self::T_CASE, self::T_SWITCH],
-            true
-        );
+        return in_array($type, self::CAN_FIX_TOKENS, true);
     }
 }

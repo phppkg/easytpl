@@ -46,7 +46,7 @@ class PhpTemplate extends AbstractTemplate
      *
      * @return string
      */
-    public function renderString(string $tplCode, array $tplVars): string
+    public function renderString(string $tplCode, array $tplVars = []): string
     {
         $tempFile = $this->genTmpPhpFile($tplCode);
 
@@ -59,7 +59,7 @@ class PhpTemplate extends AbstractTemplate
      *
      * @return string
      */
-    public function renderFile(string $tplFile, array $tplVars): string
+    public function renderFile(string $tplFile, array $tplVars = []): string
     {
         return $this->doRenderFile($tplFile, $tplVars);
     }

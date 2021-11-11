@@ -9,12 +9,14 @@
 
 ## Features
 
-- it's simple and fastly
+- It's simple and fastly. 
+  - It is simply processed and converted into native PHP syntax
 - simple echo syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
 - chained access array value syntax. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
-- support php builtin string function as filters. eg: `{{ $var | ucfirst }}`
+- support php builtin function as filters. eg: `{{ $var | ucfirst }}`
 - support all control syntax. such as `if,elseif,else;foreach;for;switch`
 - support add custom filters.
+  - default builtin filters: `upper` `lower` `nl`
 - support add custom directive.
 
 ## Install
@@ -30,34 +32,62 @@ composer require phppkg/easytpl
 ```php
 use PhpPkg\EasyTpl\EasyTemplate;
 
+$tplCode = <<<'CODE'
+My name is {{ $name | strtoupper }},
+My develop tags:
+{{ foreach($tags => $tag) }}
+- {{ $tag }}
+
+{{ endforeach }}
+CODE;
+
 $t = new EasyTemplate();
-$t->renderString($tplCode);
+
+$str = $t->renderString($tplCode, [
+    'name' => 'inhere',
+    'tags' => ['php', 'go', 'java'],
+]);
+
+echo $str;
 ```
 
-## Custom directives
+**Output**:
 
-You can use the directives implement some special logic.
+```text
+My name is INHERE,
+My develop tags:
+- php
+- go
+- java
+```
+
+### More usage
+
+**chained access array**
+
+Use `.` access array value.
 
 ```php
-$tpl = EasyTemplate::new();
-$tpl->addDirective(
-    'include',
-    function (string $body, string $name) {
-        /** will call {@see EasyTemplate::include()} */
-        return '$this->' . $name . $body;
-    }
-);
+$arr = [
+    'val0',
+    'subKey' => 'val1',
+];
 ```
 
-In template can use:
+Use in template:
 
 ```php
-
-{{ include('part/header.tpl', ['title' => 'My world']) }}
-
+First value is: {{ $arr.0 }}
+'subKey' value is: {{ $arr.subKey }}
 ```
 
-### Filters
+## Use Filters
+
+Default builtin filters: 
+
+- `upper` - equals `strtoupper`
+- `lower` - equals `strtolower`
+- `nl` append newline `\n`
 
 ### Using the filters
 
@@ -81,7 +111,7 @@ You can use the filters in any of your templates.
 ```php
 {{ $name | ucfirst | substr:0,1 }}
 {{ $user['name'] | ucfirst | substr:0,1 }}
-{{ $currentUser->name | ucfirst | substr:0,1 }}
+{{ $userObj->name | ucfirst | substr:0,1 }}
 {{ getName() | ucfirst | substr:0,1 }}
 ```
 
@@ -93,14 +123,6 @@ You can use the filters in any of your templates.
 }}
 
 {{ '12.75' | add_suffix:$suffix }} // 12.75￥
-```
-
-**Built-in functionality**:
-
-```php
-{{ 'This is a title' | slug }} // this-is-a-title
-{{ 'This is a title' | title }} // This Is A Title
-{{ 'foo_bar' | studly }} // FooBar
 ```
 
 ### Custom filters
@@ -118,6 +140,40 @@ $tpl->addFilters([
         return substr($str, -3);
     },
 ]);
+```
+
+Use in template:
+
+```php
+{{
+  $name = 'inhere';
+}}
+
+{{ $name | upper }} // Output: INHERE
+{{ $name | last3chars }} // Output: ere
+{{ $name | last3chars | upper }} // Output: ERE
+```
+
+## Custom directives
+
+You can use the directives implement some special logic.
+
+```php
+$tpl = EasyTemplate::new();
+$tpl->addDirective(
+    'include',
+    function (string $body, string $name) {
+        /** will call {@see EasyTemplate::include()} */
+        return '$this->' . $name . $body;
+    }
+);
+```
+
+In template can use:
+
+```php
+
+{{ include('part/header.tpl', ['title' => 'My world']) }}
 
 ```
 

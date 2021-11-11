@@ -31,7 +31,7 @@ class SimpleTemplate extends AbstractTemplate
      *
      * @return string
      */
-    public function renderFile(string $tplFile, array $tplVars): string
+    public function renderFile(string $tplFile, array $tplVars = []): string
     {
         if (!file_exists($tplFile)) {
             throw new InvalidArgumentException('No such template file:' . $tplFile);
@@ -48,7 +48,7 @@ class SimpleTemplate extends AbstractTemplate
      *
      * @return string
      */
-    public function renderString(string $tplCode, array $tplVars): string
+    public function renderString(string $tplCode, array $tplVars = []): string
     {
         if ($this->globalVars) {
             $tplVars = array_merge($this->globalVars, $tplVars);
