@@ -5,19 +5,22 @@
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
 
-⚡️ 简单快速的 PHP 模板引擎
+⚡️ 简单快速的 PHP 模板引擎。
 
 > **[EN-README](README.md)**
 
 ## 功能特性
 
 - 简单、轻量且快速。
+  - 无学习成本
   - 仅仅简单处理并转换为原生PHP语法
   - 兼容PHP原生语法使用
-- 支持简单的输出语法。 例如：`{{= $var }}` `{{ $var }}` `{{ echo $var }}`
-- 支持所有控制语法。 如 `if,elseif,else;foreach;for;switch`
+- 更加简单的输出语法。 例如：`{{= $var }}` `{{ $var }}` `{{ echo $var }}`
+- 支持所有控制语法。 例如 `if,elseif,else;foreach;for;switch`
 - 支持链式访问数组值。 例如：`{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
-- 支持使用 PHP 内置函数作为过滤器。 例如：`{{ $var | ucfirst }}`
+- 更加安全，默认会自动通过 `htmlspecialchars` 将输出结果进行处理
+  - 除非设置了禁用或者手动使用 `raw` 过滤器
+- 支持使用PHP内置函数作为过滤器。 例如：`{{ $var | ucfirst }}`
 - 支持添加自定义过滤器
   - 默认内置过滤器：`upper` `lower` `nl`
 - 支持添加自定义指令，提供自定义功能
@@ -71,6 +74,9 @@ My develop tags:
 
 ### 更多使用
 
+- `EasyTemplate` 默认开启输出过滤，可用于渲染视图模板
+- `TextTemplate` 则是关闭了输出过滤，主要用于文本处理，代码生成等
+
 **配置设置**
 
 ```php
@@ -83,6 +89,31 @@ $t = EasyTemplate::new([
 
 // do something ...
 ```
+
+更多设置：
+
+```php
+/** @var PhpPkg\EasyTpl\EasyTemplate $t */
+$t->disableEchoFilter();
+$t->addFilter($name, $filterFn);
+$t->addFilters([]);
+$t->addDirective($name, $handler);
+```
+
+**输出变量值**
+
+下面的语句一样，都可以用于打印输出变量值
+
+```php
+{{ $name }}
+{{= $name }}
+{{ echo $name }}
+```
+
+> 默认会自动通过 `htmlspecialchars` 将输出结果进行处理，除非设置了禁用或者手动使用 `raw` 过滤器
+
+- 设置禁用输出过滤 `$t->disableEchoFilter()`
+- 模板中禁用输出过滤 `{{ $name | raw }}`
 
 **快速访问数组值**
 
@@ -174,7 +205,7 @@ $tpl = EasyTemplate::new();
 // use php built function
 $tpl->addFilter('upper', 'strtoupper');
 
-// add more
+// 一次添加多个
 $tpl->addFilters([
     'last3chars' => function (string $str): string {
         return substr($str, -3);

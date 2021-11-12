@@ -11,13 +11,16 @@
 
 ## Features
 
-- It's simple, lightweight and fastly. 
+- It's simple, lightweight and fastly.
+  - No learning costs, syntax like PHP template
   - It is simply processed and converted into native PHP syntax
   - Compatible with PHP native syntax
 - support simple echo print syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
-- support chained access array value. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
-- support php builtin function as filters. eg: `{{ $var | ucfirst }}`
 - support all control syntax. such as `if,elseif,else;foreach;for;switch`
+- support chained access array value. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
+- More secure, the output will be processed automatically through `htmlspecialchars` by default
+  - You can set to disable output filtering or manually use the `raw` filter
+- support php builtin function as filters. eg: `{{ $var | ucfirst }}`
 - support add custom filters.
   - default builtin filters: `upper` `lower` `nl`
 - support add custom directive.
@@ -83,6 +86,32 @@ $t = EasyTemplate::new([
 
 // do something ...
 ```
+
+更多设置：
+
+```php
+/** @var PhpPkg\EasyTpl\EasyTemplate $t */
+$t->disableEchoFilter();
+$t->addFilter($name, $filterFn);
+$t->addFilters([]);
+$t->addDirective($name, $handler);
+```
+
+**echo variable**
+
+The following statements are the same, can be used to print out variable values
+
+```php
+{{ $name }}
+{{= $name }}
+{{ echo $name }}
+```
+
+> By default, the output result will be automatically processed through `htmlspecialchars`,
+> unless disabled or manually used `raw` filter
+
+- Set to disable output filtering `$t->disableEchoFilter()`
+- Disable output filtering in the template `{{ $name | raw }}`
 
 **chained access array**
 
