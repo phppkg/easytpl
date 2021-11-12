@@ -4,10 +4,9 @@
 [![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
+[![zh-CN readme](https://img.shields.io/badge/中文-Readme-brightgreen.svg?maxAge=2592000)](README.zh-CN.md)
 
 ⚡️ Simple and fastly template engine for PHP
-
-> **[中文说明](README.zh-CN.md)**
 
 ## Features
 
