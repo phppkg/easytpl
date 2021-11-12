@@ -70,7 +70,7 @@ abstract class AbstractTemplate implements TemplateInterface
     /**
      * Class constructor.
      *
-     * @param array $config
+     * @param array{tplDir: string, allowExt: array, globalVars: array} $config
      */
     public function __construct(array $config = [])
     {

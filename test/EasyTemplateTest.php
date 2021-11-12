@@ -236,4 +236,18 @@ My develop tags:
 
         vdump($result);
     }
+
+    public function testRender_include_file(): void
+    {
+        $t = new EasyTemplate([
+            'tplDir' => __DIR__ . '/testdata',
+        ]);
+
+        $result = $t->renderFile('home', ['name' => 'inhere']);
+        $this->assertNotEmpty($result);
+        $this->assertStringNotContainsString('include', $result);
+        $this->assertStringContainsString('inhere', $result);
+        $this->assertStringContainsString('Title: Use Include Example', $result);
+        // vdump($result);
+    }
 }
