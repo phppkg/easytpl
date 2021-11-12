@@ -87,7 +87,7 @@ $t = EasyTemplate::new([
 // do something ...
 ```
 
-更多设置：
+more settings：
 
 ```php
 /** @var PhpPkg\EasyTpl\EasyTemplate $t */
