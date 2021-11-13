@@ -4,7 +4,7 @@
 [![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
-[![English readme](https://img.shields.io/badge/English-Readme-brightgreen.svg?maxAge=2592000)](README.md)
+[![English readme](https://img.shields.io/badge/English-Readme-brightgreen.svg?style=for-the-badge&maxAge=2592000)](README.md)
 
 ⚡️ 简单快速的 PHP 模板引擎。
 
