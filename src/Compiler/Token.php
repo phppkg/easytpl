@@ -82,6 +82,7 @@ class Token
         self::T_IF,
         self::T_ELSEIF,
         self::T_ELSE,
+        self::T_FOR,
         self::T_FOREACH,
         self::T_CASE,
         self::T_SWITCH

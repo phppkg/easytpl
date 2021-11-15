@@ -106,6 +106,13 @@ The following statements are the same, can be used to print out variable values
 {{ echo $name }}
 ```
 
+More:
+
+```php
+{{ $name ?: 'inhere' }}
+{{ $age > 20 ? '20+' : '<= 20' }}
+```
+
 > By default, the output result will be automatically processed through `htmlspecialchars`,
 > unless disabled or manually used `raw` filter
 
@@ -130,15 +137,75 @@ First value is: {{ $arr.0 }} // val0
 'subKey' value is: {{ $arr.subKey }} // val1
 ```
 
+**if blocks**
+
+only `if`:
+
+```php
+{{ if ($name !== '') }}
+hi, my name is {{ $name }}
+{{ endif }}
+```
+
+`if else`:
+
+```php
+hi, my name is {{ $name }}
+age is {{ $age }}, and
+{{ if ($age >= 20) }}
+ age >= 20.
+{{ else }}
+ age < 20.
+{{ endif }}
+```
+
+`if...elseif...else`:
+
+```php
+hi, my name is {{ $name }}
+age is {{ $age }}, and
+{{ if ($age >= 50) }}
+ age >= 50.
+{{ elseif ($age >= 20) }}
+ age >= 20.
+{{ else }}
+ age < 20.
+{{ endif }}
+```
+
+**for/foreach blocks**
+
+`foreach`:
+
+```php
+tags:
+
+{{ foreach($tags as $tag) }}
+- {{ $tag }}
+
+{{ endforeach }}
+```
+
+with keys:
+
+```php
+tags:
+
+{{ foreach($tags as $index => $tag) }}
+{{ $index }}. {{ $tag }}
+
+{{ endforeach }}
+```
+
 **add comments**
 
-```text
+```php
 {{# comments ... #}}{{ $name }} // inhere
 ```
 
 multi lines:
 
-```text
+```php
 {{#
  this
  comments

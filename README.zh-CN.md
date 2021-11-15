@@ -109,6 +109,13 @@ $t->addDirective($name, $handler);
 {{ echo $name }}
 ```
 
+更多:
+
+```php
+{{ $name ?: 'inhere' }}
+{{ $age > 20 ? '20+' : '<= 20' }}
+```
+
 > 默认会自动通过 `htmlspecialchars` 将输出结果进行处理，除非设置了禁用或者手动使用 `raw` 过滤器
 
 - 设置禁用输出过滤 `$t->disableEchoFilter()`
@@ -132,9 +139,69 @@ first value is: {{ $arr.0 }} // val0
 'subKey' value is: {{ $arr.subKey }} // val1
 ```
 
+**if 语句块**
+
+`if` 语句:
+
+```php
+{{ if ($name !== '') }}
+hi, my name is {{ $name }}
+{{ endif }}
+```
+
+`if else` 语句:
+
+```php
+hi, my name is {{ $name }}
+age is {{ $age }}, and
+{{ if ($age >= 20) }}
+ age >= 20.
+{{ else }}
+ age < 20.
+{{ endif }}
+```
+
+`if...elseif...else` 语句:
+
+```php
+hi, my name is {{ $name }}
+age is {{ $age }}, and
+{{ if ($age >= 50) }}
+ age >= 50.
+{{ elseif ($age >= 20) }}
+ age >= 20.
+{{ else }}
+ age < 20.
+{{ endif }}
+```
+
+**for/foreach 语句块**
+
+`foreach`:
+
+```php
+tags:
+
+{{ foreach($tags as $tag) }}
+- {{ $tag }}
+
+{{ endforeach }}
+```
+
+with keys:
+
+```php
+tags:
+
+{{ foreach($tags as $index => $tag) }}
+{{ $index }}. {{ $tag }}
+
+{{ endforeach }}
+```
+
 **模板中添加注释**
 
-以 `{{# XX  #}}` 包裹的内容将会当做注释忽略
+以 `{{#` 和 `#}}` 包裹的内容将会当做注释忽略
 
 ```text
 {{# comments ... #}}{{ $name }} // inhere

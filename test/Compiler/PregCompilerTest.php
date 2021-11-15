@@ -222,7 +222,45 @@ hi
         }
     }
 
-    public function testCompileCode_ml_define():void
+    public function testCompile_for():void
+    {
+        $p = new PregCompiler();
+
+        $code = <<<'CODE'
+{{ for ($i=0; $i< 5; $i++) }}
+    line: {{ $i }}
+{{ endfor }}
+CODE;
+        $compiled = $p->compile($code);
+        $this->assertEquals(<<<'CODE'
+<?php for ($i=0; $i< 5; $i++): ?>
+    line: <?= $i ?>
+<?php endfor ?>
+CODE
+            ,$compiled);
+    }
+
+    public function testCompile_foreach():void
+    {
+        $p = new PregCompiler();
+
+        $code = <<<'CODE'
+{{ foreach($tags as $tag) }}
+- {{ $tag }}
+
+{{ endforeach }}
+CODE;
+        $compiled = $p->compile($code);
+        $this->assertEquals(<<<'CODE'
+<?php foreach($tags as $tag): ?>
+- <?= $tag ?>
+
+<?php endforeach ?>
+CODE
+            ,$compiled);
+    }
+
+    public function testCompile_ml_define():void
     {
         $p = new PregCompiler();
 
