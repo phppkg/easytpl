@@ -71,12 +71,14 @@ My develop tags:
 - java
 ```
 
-### 更多使用
+## 更多使用说明
+
+语法跟PHP原生模板一样的，加入的特殊语法使用只是为了使用更加方便。
 
 - `EasyTemplate` 默认开启输出过滤，可用于渲染视图模板
 - `TextTemplate` 则是关闭了输出过滤，主要用于文本处理，代码生成等
 
-**配置设置**
+### 配置设置
 
 ```php
 use PhpPkg\EasyTpl\EasyTemplate;
@@ -99,7 +101,7 @@ $t->addFilters([]);
 $t->addDirective($name, $handler);
 ```
 
-**输出变量值**
+### 输出变量值
 
 下面的语句一样，都可以用于打印输出变量值
 
@@ -121,7 +123,7 @@ $t->addDirective($name, $handler);
 - 设置禁用输出过滤 `$t->disableEchoFilter()`
 - 模板中禁用输出过滤 `{{ $name | raw }}`
 
-**快速访问数组值**
+### 快速访问数组值
 
 可以使用`.` 来快速访问数组值。
 
@@ -139,7 +141,7 @@ first value is: {{ $arr.0 }} // val0
 'subKey' value is: {{ $arr.subKey }} // val1
 ```
 
-**if 语句块**
+### If 语句块
 
 `if` 语句:
 
@@ -175,7 +177,7 @@ age is {{ $age }}, and
 {{ endif }}
 ```
 
-**for/foreach 语句块**
+### For/Foreach 语句块
 
 `foreach`:
 
@@ -199,7 +201,7 @@ tags:
 {{ endforeach }}
 ```
 
-**模板中添加注释**
+### 模板中添加注释
 
 以 `{{#` 和 `#}}` 包裹的内容将会当做注释忽略
 

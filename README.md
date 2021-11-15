@@ -71,9 +71,14 @@ My develop tags:
 - java
 ```
 
-### More usage
+## More usage
 
-**config template**
+The syntax is the same as that of the PHP native template, and the special syntax is added just to make it easier to use.
+
+-`EasyTemplate` enables output filtering by default, which can be used to render view templates
+-`TextTemplate` turns off output filtering and is mainly used for text processing, code generation, etc.
+
+### Config template
 
 ```php
 use PhpPkg\EasyTpl\EasyTemplate;
@@ -96,7 +101,7 @@ $t->addFilters([]);
 $t->addDirective($name, $handler);
 ```
 
-**echo variable**
+### Echo variable
 
 The following statements are the same, can be used to print out variable values
 
@@ -119,7 +124,7 @@ More:
 - Set to disable output filtering `$t->disableEchoFilter()`
 - Disable output filtering in the template `{{ $name | raw }}`
 
-**chained access array**
+### Chained access array
 
 Can use `.` to quick access array value.
 
@@ -137,7 +142,7 @@ First value is: {{ $arr.0 }} // val0
 'subKey' value is: {{ $arr.subKey }} // val1
 ```
 
-**if blocks**
+### If blocks
 
 only `if`:
 
@@ -173,7 +178,7 @@ age is {{ $age }}, and
 {{ endif }}
 ```
 
-**for/foreach blocks**
+### For/Foreach blocks
 
 `foreach`:
 
@@ -197,7 +202,7 @@ tags:
 {{ endforeach }}
 ```
 
-**add comments**
+### Add comments
 
 ```php
 {{# comments ... #}}{{ $name }} // inhere
