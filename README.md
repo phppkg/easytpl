@@ -75,8 +75,8 @@ My develop tags:
 
 The syntax is the same as that of the PHP native template, and the special syntax is added just to make it easier to use.
 
--`EasyTemplate` enables output filtering by default, which can be used to render view templates
--`TextTemplate` turns off output filtering and is mainly used for text processing, code generation, etc.
+- `EasyTemplate` enables output filtering by default, which can be used to render view templates.
+- `TextTemplate` turns off output filtering and is mainly used for text processing, code generation, etc.
 
 ### Config template
 
