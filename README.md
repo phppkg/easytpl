@@ -73,7 +73,7 @@ My develop tags:
 
 ## More usage
 
-The syntax is the same as that of the PHP native template, and the special syntax is added just to make it easier to use.
+The syntax is the same as the PHP native template, and the special syntax added is just to make it more convenient to use.
 
 - `EasyTemplate` enables output filtering by default, which can be used to render view templates.
 - `TextTemplate` turns off output filtering and is mainly used for text processing, code generation, etc.
@@ -203,6 +203,8 @@ tags:
 ```
 
 ### Add comments
+
+The contents wrapped with `{{` and `}}` will be ignored as comments.
 
 ```php
 {{# comments ... #}}{{ $name }} // inhere
