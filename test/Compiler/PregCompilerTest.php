@@ -129,7 +129,11 @@ CODE
         foreach ($tests as [$in, $out]) {
             $this->assertEquals($out, $p->compile($in));
         }
+    }
 
+    public function testCompile_disableEchoFilter():void
+    {
+        $p = new PregCompiler();
         $p->disableEchoFilter();
 
         $tests = [
@@ -138,6 +142,10 @@ CODE
             [
                 '{{ $name ?: "inhere" | substr:0,3 }}',
                 '<?= substr($name ?: "inhere", 0,3) ?>'
+            ],
+            [
+                '{{ $name | append:, }}',
+                "<?= append(\$name, ',') ?>"
             ],
             ['{{ some_func() | raw }}', '<?= some_func() ?>'],
         ];

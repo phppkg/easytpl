@@ -130,7 +130,7 @@ abstract class AbstractCompiler implements CompilerInterface
                     } elseif ($arg[0] === '$') {
                         $fmtArgs[] = $arg;
                     } else {
-                        $fmtArgs[] = Str::shellQuote($arg);
+                        $fmtArgs[] = Str::paramQuotes($arg);
                     }
                 }
 
