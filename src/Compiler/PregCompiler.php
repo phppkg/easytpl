@@ -8,9 +8,9 @@ use function explode;
 use function implode;
 use function is_numeric;
 use function preg_match;
+use function preg_replace;
 use function preg_replace_callback;
 use function str_contains;
-use function str_ends_with;
 use function strlen;
 use function substr;
 use function trim;
@@ -65,6 +65,11 @@ class PregCompiler extends AbstractCompiler
         $openTagE  = $this->openTagE;
         $closeTagE = $this->closeTagE;
 
+        // comments block. `{{# comments #}}`
+        if (str_contains($tplCode, "$this->openTag#")) {
+            $tplCode = preg_replace("~$openTagE#.+?#$closeTagE~s", '', $tplCode);
+        }
+
         $flags = 0;
         // $flags = PREG_OFFSET_CAPTURE;
         // $flags = PREG_PATTERN_ORDER | PREG_SET_ORDER;
@@ -109,9 +114,9 @@ class PregCompiler extends AbstractCompiler
         }
 
         // comments block. `{{# comments #}}`
-        if ($block[0] === '#' && str_ends_with($block, '#')) {
-            return '';
-        }
+        // if ($block[0] === '#' && str_ends_with($block, '#')) {
+        //     return '';
+        // }
 
         $isInline = !str_contains($trimmed, "\n");
         $kwPattern = Token::getBlockNamePattern();

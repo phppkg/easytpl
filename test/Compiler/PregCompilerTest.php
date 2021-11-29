@@ -199,6 +199,45 @@ $this->include("header.tpl", [
         }
     }
 
+    public function testCompile_has_comments():void
+    {
+        $p = new PregCompiler();
+
+        $str = <<<'TXT'
+{{# comments #}} hello
+TXT;
+        $out = $p->compile($str);
+        $this->assertStringNotContainsString('{{#', $out);
+        $this->assertStringNotContainsString('comments', $out);
+        $this->assertEquals(' hello', $out);
+
+        $str = <<<'TXT'
+{{# multi
+ line
+  comments
+#}} hello
+TXT;
+        $out = $p->compile($str);
+        $this->assertStringNotContainsString('{{#', $out);
+        $this->assertStringNotContainsString('comments', $out);
+        $this->assertEquals(' hello', $out);
+
+        $str = <<<'TXT'
+{{ foreach ($vars as $var): }}
+{{#
+comments
+ newInfo.incr{{ $var | ucfirst }}({{ $var }});
+#}}
+public void {{ $var | ucfirst }}(Integer value) {
+    {{ $var }} += value;
+}
+{{ endforeach }}
+TXT;
+        $out = $p->compile($str);
+        $this->assertStringNotContainsString('{{#', $out);
+        $this->assertStringNotContainsString('comments', $out);
+    }
+
     public function testCompile_if_block():void
     {
         $p = new PregCompiler();
