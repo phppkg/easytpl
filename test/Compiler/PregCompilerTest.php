@@ -177,67 +177,6 @@ CODE
         }
     }
 
-    public function testCompile_customDirective():void
-    {
-        $p = new PregCompiler();
-        $p->addDirective('include', function (string $body, string $name) {
-            return '$this->' . $name . $body;
-        });
-
-        $tests = [
-            ['{{ include("header.tpl") }}', '<?php $this->include("header.tpl") ?>'],
-            ['{{ include("header.tpl", [
-   "key1" => "value1",
-]) }}', '<?php
-$this->include("header.tpl", [
-   "key1" => "value1",
-])
-?>'],
-        ];
-        foreach ($tests as [$in, $out]) {
-            $this->assertEquals($out, $p->compile($in));
-        }
-    }
-
-    public function testCompile_has_comments():void
-    {
-        $p = new PregCompiler();
-
-        $str = <<<'TXT'
-{{# comments #}} hello
-TXT;
-        $out = $p->compile($str);
-        $this->assertStringNotContainsString('{{#', $out);
-        $this->assertStringNotContainsString('comments', $out);
-        $this->assertEquals(' hello', $out);
-
-        $str = <<<'TXT'
-{{# multi
- line
-  comments
-#}} hello
-TXT;
-        $out = $p->compile($str);
-        $this->assertStringNotContainsString('{{#', $out);
-        $this->assertStringNotContainsString('comments', $out);
-        $this->assertEquals(' hello', $out);
-
-        $str = <<<'TXT'
-{{ foreach ($vars as $var): }}
-{{#
-comments
- newInfo.incr{{ $var | ucfirst }}({{ $var }});
-#}}
-public void {{ $var | ucfirst }}(Integer value) {
-    {{ $var }} += value;
-}
-{{ endforeach }}
-TXT;
-        $out = $p->compile($str);
-        $this->assertStringNotContainsString('{{#', $out);
-        $this->assertStringNotContainsString('comments', $out);
-    }
-
     public function testCompile_if_block():void
     {
         $p = new PregCompiler();
@@ -337,6 +276,67 @@ $a = random_int(1, 10);
 ?>
 CODE
             ,$compiled);
+    }
+
+    public function testCompile_customDirective_include():void
+    {
+        $p = new PregCompiler();
+        $p->addDirective('include', function (string $body, string $name) {
+            return '$this->' . $name . $body;
+        });
+
+        $tests = [
+            ['{{ include("header.tpl") }}', '<?php $this->include("header.tpl") ?>'],
+            ['{{ include("header.tpl", [
+   "key1" => "value1",
+]) }}', '<?php
+$this->include("header.tpl", [
+   "key1" => "value1",
+])
+?>'],
+        ];
+        foreach ($tests as [$in, $out]) {
+            $this->assertEquals($out, $p->compile($in));
+        }
+    }
+
+    public function testCompile_has_comments():void
+    {
+        $p = new PregCompiler();
+
+        $str = <<<'TXT'
+{{# comments #}} hello
+TXT;
+        $out = $p->compile($str);
+        $this->assertStringNotContainsString('{{#', $out);
+        $this->assertStringNotContainsString('comments', $out);
+        $this->assertEquals(' hello', $out);
+
+        $str = <<<'TXT'
+{{# multi
+ line
+  comments
+#}} hello
+TXT;
+        $out = $p->compile($str);
+        $this->assertStringNotContainsString('{{#', $out);
+        $this->assertStringNotContainsString('comments', $out);
+        $this->assertEquals(' hello', $out);
+
+        $str = <<<'TXT'
+{{ foreach ($vars as $var): }}
+{{#
+comments
+ newInfo.incr{{ $var | ucfirst }}({{ $var }});
+#}}
+public void {{ $var | ucfirst }}(Integer value) {
+    {{ $var }} += value;
+}
+{{ endforeach }}
+TXT;
+        $out = $p->compile($str);
+        $this->assertStringNotContainsString('{{#', $out);
+        $this->assertStringNotContainsString('comments', $out);
     }
 
 }

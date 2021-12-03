@@ -240,7 +240,7 @@ My develop tags:
     public function testRender_include_file(): void
     {
         $t = new EasyTemplate([
-            'tplDir' => __DIR__ . '/testdata',
+            'tplDir' => __DIR__ . '/testdata/includes',
         ]);
 
         $result = $t->renderFile('home', ['name' => 'inhere']);

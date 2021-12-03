@@ -30,14 +30,6 @@ class LineCompiler extends AbstractCompiler
     private bool $insideTag = false;
 
     /**
-     * @return static
-     */
-    public static function new(): self
-    {
-        return new self();
-    }
-
-    /**
      * compile template contents to raw PHP template codes
      *
      * @param string $tplCode

@@ -79,9 +79,10 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     {
         // add built-in filters
         $this->addFilters([
-            'upper' => 'strtoupper',
-            'lower' => 'strtolower',
-            'nl'    => function ($str): string {
+            'upper'  => 'strtoupper',
+            'lower'  => 'strtolower',
+            'escape' => 'htmlspecialchars',
+            'nl'     => function ($str): string {
                 return $str . "\n";
             },
         ]);
