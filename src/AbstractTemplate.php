@@ -62,7 +62,7 @@ abstract class AbstractTemplate implements TemplateInterface
      *
      * @return static
      */
-    public static function new(array $config = []): self
+    public static function new(array $config = []): static
     {
         return new static($config);
     }
@@ -82,7 +82,7 @@ abstract class AbstractTemplate implements TemplateInterface
      *
      * @return $this
      */
-    public function configThis(callable $fn): self
+    public function configThis(callable $fn): static
     {
         $fn($this);
         return $this;
@@ -242,7 +242,7 @@ abstract class AbstractTemplate implements TemplateInterface
      *
      * @return AbstractTemplate
      */
-    public function setPathResolver(callable $pathResolver): self
+    public function setPathResolver(callable $pathResolver): static
     {
         $this->pathResolver = $pathResolver;
         return $this;

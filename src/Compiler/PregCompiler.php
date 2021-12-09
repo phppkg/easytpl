@@ -27,20 +27,12 @@ class PregCompiler extends AbstractCompiler
     private string $closeTagE = '\}\}';
 
     /**
-     * @return static
-     */
-    public static function new(): self
-    {
-        return new self();
-    }
-
-    /**
      * @param string $open
      * @param string $close
      *
      * @return $this
      */
-    public function setOpenCloseTag(string $open, string $close): self
+    public function setOpenCloseTag(string $open, string $close): static
     {
         parent::setOpenCloseTag($open, $close);
 
@@ -112,11 +104,6 @@ class PregCompiler extends AbstractCompiler
         if ($trimmed === '}') {
             return self::PHP_TAG_OPEN . ' } ' . self::PHP_TAG_CLOSE;
         }
-
-        // comments block. `{{# comments #}}`
-        // if ($block[0] === '#' && str_ends_with($block, '#')) {
-        //     return '';
-        // }
 
         $isInline = !str_contains($trimmed, "\n");
         $kwPattern = Token::getBlockNamePattern();

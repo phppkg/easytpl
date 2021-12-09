@@ -62,11 +62,28 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * custom directive, control statement token.
      *
-     * eg: implement include()
+     * -----
+     * eg: implements: `include('parts/header.tpl')`
+     *
+     * ```php
+     * $compiler->addDirective('include', function(string $body, string $name): string {
+     *      // $name : 'include'
+     *      // $body : "('parts/header.tpl')"
+     *      // do something...
+     * });
+     * ```
      *
      * @var array{string, callable(string, string): string}
      */
     public array $customDirectives = [];
+
+    /**
+     * @return static
+     */
+    public static function new(): static
+    {
+        return new static();
+    }
 
     /**
      * @param string $open
@@ -74,7 +91,7 @@ abstract class AbstractCompiler implements CompilerInterface
      *
      * @return $this
      */
-    public function setOpenCloseTag(string $open, string $close): self
+    public function setOpenCloseTag(string $open, string $close): static
     {
         $this->openTag  = $open;
         $this->closeTag = $close;
@@ -173,18 +190,18 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param string $name
      * @param callable $handler
      *
-     * @return $this
+     * @return static
      */
-    public function addDirective(string $name, callable $handler): self
+    public function addDirective(string $name, callable $handler): static
     {
         $this->customDirectives[$name] = $handler;
         return $this;
     }
 
     /**
-     * @return $this
+     * @return static
      */
-    public function disableEchoFilter(): self
+    public function disableEchoFilter(): static
     {
         $this->echoFilterFunc = self::RAW_OUTPUT;
         return $this;

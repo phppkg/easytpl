@@ -15,12 +15,20 @@ interface CompilerInterface
      *
      * @return $this
      */
-    public function setOpenCloseTag(string $open, string $close): self;
+    public function setOpenCloseTag(string $open, string $close): static;
 
     /**
      * @return $this
      */
-    public function disableEchoFilter(): self;
+    public function disableEchoFilter(): static;
+
+    /**
+     * @param string $name
+     * @param callable $handler
+     *
+     * @return static
+     */
+    public function addDirective(string $name, callable $handler): static;
 
     /**
      * compile template contents to raw PHP template codes
