@@ -12,10 +12,10 @@
     }
   ],
   "require": {
-    "php": ">8.0",
+    "php": ">=8.0.1",
     "ext-mbstring": "*",
-    "toolkit/fsutil":"~1.0",
-    "toolkit/stdlib":"~1.0"
+    "toolkit/fsutil":"~2.0",
+    "toolkit/stdlib":"~2.0"
   },
   "autoload": {
     "psr-4": {
