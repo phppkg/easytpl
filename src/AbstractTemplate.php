@@ -2,8 +2,8 @@
 
 namespace PhpPkg\EasyTpl;
 
-use PhpPkg\EasyTpl\Contract\TemplateInterface;
 use InvalidArgumentException;
+use PhpPkg\EasyTpl\Contract\TemplateInterface;
 use Toolkit\FsUtil\File;
 use Toolkit\Stdlib\Obj;
 use function is_file;
@@ -114,11 +114,11 @@ abstract class AbstractTemplate implements TemplateInterface
         }
 
         if (!$this->tplDir) {
-            throw new InvalidArgumentException("no such template file: $tplName");
+            throw new InvalidArgumentException("no found template file: $tplName");
         }
 
         $suffix  = '';
-        $tplFile = $this->tplDir . '/' . $tplName;
+        $tplFile = $this->resolvePath($this->tplDir) . '/' . $tplName;
         if (strpos($tplName, '.') > 0) {
             $suffix = File::getExtension($tplName);
         }
@@ -137,7 +137,7 @@ abstract class AbstractTemplate implements TemplateInterface
             }
         }
 
-        throw new InvalidArgumentException("tplDir - no such template file: $tplName");
+        throw new InvalidArgumentException("tplDir: no such template file: $tplName");
     }
 
     /**
