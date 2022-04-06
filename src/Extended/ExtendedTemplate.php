@@ -1,4 +1,11 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of phppkg/easytpl.
+ *
+ * @link     https://github.com/inhere
+ * @author   https://github.com/inhere
+ * @license  MIT
+ */
 
 namespace PhpPkg\EasyTpl\Extended;
 
@@ -26,8 +33,7 @@ class ExtendedTemplate extends EasyTemplate
             ->addDirective('extend', function (string $tplName) {
                 return ExtendLoader::new()->handle($tplName);
             })
-            ->addDirective('extends', function () {
-
+            ->addDirective('extends', function (): void {
             })
             ->addDirective('block', function (string $body) {
                 $this->currentBlock = trim($body, '() ');
@@ -41,11 +47,9 @@ class ExtendedTemplate extends EasyTemplate
 
     protected function startBlock(string $name): void
     {
-
     }
 
     protected function endBlock(): void
     {
-
     }
 }

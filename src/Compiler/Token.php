@@ -1,4 +1,11 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of phppkg/easytpl.
+ *
+ * @link     https://github.com/inhere
+ * @author   https://github.com/inhere
+ * @license  MIT
+ */
 
 namespace PhpPkg\EasyTpl\Compiler;
 
@@ -24,22 +31,35 @@ class Token
 
     // if statement
     public const T_IF     = 'if';
+
     public const T_ELSEIF = 'elseif';
+
     public const T_ELSE   = 'else';
+
     public const T_ENDIF  = 'endif';
+
     // for statement
     public const T_FOR    = 'for';
+
     public const T_ENDFOR = 'endfor';
+
     // foreach statement
     public const T_FOREACH    = 'foreach';
+
     public const T_ENDFOREACH = 'endforeach';
+
     // switch statement
     public const T_SWITCH    = 'switch';
+
     public const T_CASE      = 'case';
+
     public const T_DEFAULT   = 'default';
+
     public const T_ENDSWITCH = 'endswitch';
+
     // special keywords
     public const T_BREAK    = 'break';
+
     public const T_CONTINUE = 'continue';
 
     public const ALONE_TOKENS = [

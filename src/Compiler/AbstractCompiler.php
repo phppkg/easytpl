@@ -1,4 +1,11 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of phppkg/easytpl.
+ *
+ * @link     https://github.com/inhere
+ * @author   https://github.com/inhere
+ * @license  MIT
+ */
 
 namespace PhpPkg\EasyTpl\Compiler;
 
@@ -25,11 +32,15 @@ use function strlen;
 abstract class AbstractCompiler implements CompilerInterface
 {
     public const PHP_TAG_OPEN  = '<?php';
+
     public const PHP_TAG_ECHO  = '<?';
+
     public const PHP_TAG_ECHO1 = '<?=';
+
     public const PHP_TAG_CLOSE = '?>';
 
     public string $openTag = '{{';
+
     public string $closeTag = '}}';
 
     public const RAW_OUTPUT = 'raw';
