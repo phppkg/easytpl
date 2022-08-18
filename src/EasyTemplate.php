@@ -9,10 +9,10 @@
 
 namespace PhpPkg\EasyTpl;
 
+use InvalidArgumentException;
 use PhpPkg\EasyTpl\Compiler\PregCompiler;
 use PhpPkg\EasyTpl\Contract\CompilerInterface;
 use PhpPkg\EasyTpl\Contract\EasyTemplateInterface;
-use InvalidArgumentException;
 use Toolkit\FsUtil\File;
 use function file_exists;
 use function file_get_contents;
@@ -76,13 +76,13 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
         parent::__construct($config);
 
         // init
-        $this->init($this->compiler);
+        $this->initCompiler($this->compiler);
     }
 
     /**
      * @param CompilerInterface $compiler
      */
-    protected function init(CompilerInterface $compiler): void
+    protected function initCompiler(CompilerInterface $compiler): void
     {
         // add built-in filters
         $this->addFilters([

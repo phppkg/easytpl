@@ -23,11 +23,11 @@ class ExtendedTemplate extends EasyTemplate
 {
     public const BLOCK_VAR_PREFIX = 'TPL_BLOCK_';
 
-    private $currentBlock = '';
+    private string $currentBlock = '';
 
-    protected function init(CompilerInterface $compiler): void
+    protected function initCompiler(CompilerInterface $compiler): void
     {
-        parent::init($compiler);
+        parent::initCompiler($compiler);
 
         $compiler
             ->addDirective('extend', function (string $tplName) {

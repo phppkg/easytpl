@@ -18,9 +18,9 @@ use PhpPkg\EasyTpl\EasyTemplate;
  */
 class LayoutTemplate extends EasyTemplate
 {
-    protected function init(CompilerInterface $compiler): void
+    protected function initCompiler(CompilerInterface $compiler): void
     {
-        parent::init($compiler);
+        parent::initCompiler($compiler);
 
         $compiler
             ->addDirective('layout', function (string $tplName) {
