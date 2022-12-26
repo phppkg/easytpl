@@ -106,6 +106,7 @@ $t->addDirective($name, $handler);
 下面的语句一样，都可以用于打印输出变量值
 
 ```php
+{{ name }}
 {{ $name }}
 {{= $name }}
 {{ echo $name }}

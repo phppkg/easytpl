@@ -9,6 +9,7 @@
 
 namespace PhpPkg\EasyTpl\Compiler;
 
+use Toolkit\Stdlib\Str;
 use function addslashes;
 use function array_keys;
 use function explode;
@@ -179,6 +180,11 @@ class PregCompiler extends AbstractCompiler
 
         // inline echo support filters
         if ($isInline && $type === Token::T_ECHO) {
+            // auto append var prefix: $
+            if ($trimmed[0] !== '$' && Str::isVarName($trimmed)) {
+                $trimmed = '$' . $trimmed;
+            }
+
             $endChar = $endChar ?: $trimmed[strlen($trimmed) - 1];
             if ($endChar !== ';' && str_contains($trimmed, $this->filterSep)) {
                 $echoBody = substr($trimmed, strlen($eKws));
@@ -214,4 +220,5 @@ class PregCompiler extends AbstractCompiler
 
         return $open . $trimmed . $close;
     }
+
 }

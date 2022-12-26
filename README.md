@@ -106,6 +106,7 @@ $t->addDirective($name, $handler);
 The following statements are the same, can be used to print out variable values
 
 ```php
+{{ name }}
 {{ $name }}
 {{= $name }}
 {{ echo $name }}

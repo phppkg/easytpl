@@ -72,6 +72,7 @@ class PregCompilerTest extends BaseTestCase
 
         $tests = [
             ['{{ "a" . "b" }}', '<?= "a" . "b" ?>'],
+            ['{{ name }}', '<?= $name ?>'],
             ['{{ $name }}', '<?= $name ?>'],
             ['{{ $name; }}', '<?= $name; ?>'],
             ['{{ $name ?: "inhere" }}', '<?= $name ?: "inhere" ?>'],
