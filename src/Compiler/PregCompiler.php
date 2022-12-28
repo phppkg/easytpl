@@ -195,7 +195,7 @@ class PregCompiler extends AbstractCompiler
         // handle
         // - convert $ctx.top.sub to $ctx[top][sub]
         $pattern = '~(' . implode(')|(', [
-                '\$[\w.]+\w', // array key path.
+                '\$[\w.-]+\w', // array key path.
             ]) . ')~';
 
         // https://www.php.net/manual/zh/reference.pcre.pattern.modifiers.php
