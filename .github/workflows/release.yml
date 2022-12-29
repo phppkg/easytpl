@@ -10,14 +10,12 @@ jobs:
     name: Test on php ${{ matrix.php}}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [8.0]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set ENV for github-release
         # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
@@ -25,45 +23,19 @@ jobs:
           echo "RELEASE_TAG=${GITHUB_REF:10}" >> $GITHUB_ENV
           echo "RELEASE_NAME=$GITHUB_WORKFLOW" >> $GITHUB_ENV
 
-      # usage refer https://github.com/shivammathur/setup-php
-      - name: Setup PHP
-        timeout-minutes: 5
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php}}
-          tools: pecl, php-cs-fixer, phpunit
-          extensions: mbstring, dom, fileinfo, openssl # , swoole-4.4.19 #optional, setup extensions
-          ini-values: post_max_size=56M, short_open_tag=On #optional, setup php.ini configuration
-          coverage: none #optional, setup coverage driver: xdebug, none
-
-      # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-      # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-      - name: Install dependencies
+      - name: Generate changelog
         run: |
-          echo $RELEASE_TAG
-          echo $RELEASE_NAME
-          tag1=${GITHUB_REF#refs/*/}
-          echo "release tag: ${tag1}"
-          composer update --no-progress
-
-      # more see https://github.com/inhere/kite
-      - name: Generate changelog file
-        id: changelog
-        run: |
-          wget -c -q https://github.com/inhere/kite/releases/latest/download/kite.phar
-          php kite.phar git cl prev last --style gh-release --no-merges --fetch-tags --unshallow --file changelog.md
-          cat changelog.md
+          curl https://github.com/gookit/gitw/releases/latest/download/chlog-linux-amd64 -L -o /usr/local/bin/chlog
+          chmod a+x /usr/local/bin/chlog
+          chlog -c .github/changelog.yml -o changelog.md prev last 
 
       # https://github.com/softprops/action-gh-release
       - name: Create release and upload assets
         uses: softprops/action-gh-release@v1
-#        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: ${{ env.RELEASE_TAG }}
           tag_name: ${{ env.RELEASE_TAG }}
           body_path: changelog.md
-          # files: kite-${{ env.RELEASE_TAG }}.phar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #         GITHUB_REPOSITORY: my_gh_org/my_gh_repo
