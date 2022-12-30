@@ -12,7 +12,7 @@ use function vdump;
  */
 class EasyTemplateTest extends BaseTestCase
 {
-    private $tplVars = [
+    private array $tplVars = [
         'int' => 23,
         'str' => 'a string',
         'arr' => [
@@ -25,9 +25,16 @@ class EasyTemplateTest extends BaseTestCase
         ],
     ];
 
+    private function newTemplate(): EasyTemplate
+    {
+        return new EasyTemplate([
+            'tmpDir' => $this->getTestdataPath('easy-caches'),
+        ]);
+    }
+
     public function testCompileCode_check(): void
     {
-        $t2 = new EasyTemplate();
+        $t2 = $this->newTemplate();
 
         $compiled = $t2->compileCode('');
         $this->assertEquals('', $compiled);
@@ -38,7 +45,7 @@ class EasyTemplateTest extends BaseTestCase
 
     public function testV2RenderFile_use_echo_foreach(): void
     {
-        $t = new EasyTemplate();
+        $t = $this->newTemplate();
 
         $tplFile = $this->getTestTplFile('testdata/use_echo_foreach.tpl');
         $tplVars = ['vars' => ['Info', 'Error', 'Warn']];
@@ -87,12 +94,13 @@ class EasyTemplateTest extends BaseTestCase
 
     public function testRenderFile_use_all_token(): void
     {
-        $t = new EasyTemplate();
+        $t = $this->newTemplate();
 
         $tplFile = $this->getTestTplFile('testdata/use_all_token.tpl');
         $result = $t->renderFile($tplFile, $this->tplVars);
 
         $this->assertNotEmpty($result);
+        $this->assertStringNotContainsString('{{', $result);
         vdump($result);
     }
 
@@ -116,7 +124,7 @@ class EasyTemplateTest extends BaseTestCase
 
         $code = '{{ 34.5 | ceil }}';
         $this->assertEquals('<?= htmlspecialchars((string)ceil(34.5)) ?>', $t->compileCode($code));
-        $this->assertEquals('35', $t->renderString($code, []));
+        $this->assertEquals('35', $t->renderString($code));
     }
 
     public function testAddFilters_compile_render(): void

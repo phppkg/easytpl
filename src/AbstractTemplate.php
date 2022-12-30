@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use PhpPkg\EasyTpl\Contract\TemplateInterface;
 use Toolkit\FsUtil\File;
 use Toolkit\Stdlib\Obj;
+use function dirname;
 use function is_file;
 use function strpos;
 
@@ -120,17 +121,38 @@ abstract class AbstractTemplate implements TemplateInterface
             return $this->tplFiles[$tplName];
         }
 
-        if (!$this->tplDir) {
-            throw new InvalidArgumentException("no found template file: $tplName");
-        }
-
         $suffix  = '';
-        $tplFile = $this->resolvePath($this->tplDir) . '/' . $tplName;
         if (strpos($tplName, '.') > 0) {
             $suffix = File::getExtension($tplName);
         }
 
-        // is an exists file
+        // check is an exists file on tplDir
+        if ($this->tplDir) {
+            $tplFile = $this->resolvePath($this->tplDir) . '/' . $tplName;
+            if ($tplFile = $this->tryExistFile($tplFile, $suffix)) {
+                return $tplFile;
+            }
+        }
+
+        // try relative the parent tpl file dir.
+        if ($this->curTplFile) {
+            $tplFile = dirname($this->curTplFile) . '/' . $tplName;
+            if ($tplFile = $this->tryExistFile($tplFile, $suffix)) {
+                return $tplFile;
+            }
+        }
+
+        throw new InvalidArgumentException("no such template file: $tplName");
+    }
+
+    /**
+     * @param string $tplFile
+     * @param string $suffix
+     *
+     * @return string
+     */
+    protected function tryExistFile(string $tplFile, string $suffix): string
+    {
         if ($suffix) {
             if (is_file($tplFile)) {
                 return $tplFile;
@@ -144,7 +166,7 @@ abstract class AbstractTemplate implements TemplateInterface
             }
         }
 
-        throw new InvalidArgumentException("tplDir: no such template file: $tplName");
+        return ''; // not exist
     }
 
     /**
