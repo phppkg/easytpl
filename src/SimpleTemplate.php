@@ -10,12 +10,11 @@
 namespace PhpPkg\EasyTpl;
 
 use InvalidArgumentException;
+use Toolkit\Stdlib\Str;
 use function array_merge;
 use function explode;
 use function file_get_contents;
-use function sprintf;
 use function str_contains;
-use function strtr;
 
 /**
  * Class SimpleTemplate
@@ -35,7 +34,7 @@ class SimpleTemplate extends AbstractTemplate
     /**
      * @var string
      */
-    private string $formatLeft = '{{';
+    private string $varLeft = '{{';
 
     /**
      * @param string $tplFile
@@ -46,9 +45,8 @@ class SimpleTemplate extends AbstractTemplate
     public function renderFile(string $tplFile, array $tplVars = []): string
     {
         $tplFile = $this->curTplFile = $this->findTplFile($tplFile);
-        $tplCode = file_get_contents($tplFile);
 
-        return $this->renderString($tplCode, $tplVars);
+        return $this->renderString(file_get_contents($tplFile), $tplVars);
     }
 
     /**
@@ -59,7 +57,7 @@ class SimpleTemplate extends AbstractTemplate
      */
     public function renderString(string $tplCode, array $tplVars = []): string
     {
-        if (!str_contains($tplCode, $this->formatLeft)) {
+        if (!str_contains($tplCode, $this->varLeft)) {
             return $tplCode;
         }
 
@@ -67,14 +65,7 @@ class SimpleTemplate extends AbstractTemplate
             $tplVars = array_merge($this->globalVars, $tplVars);
         }
 
-        $fmtVars = [];
-        foreach ($tplVars as $name => $var) {
-            $name = sprintf($this->format, (string)$name);
-            // add
-            $fmtVars[$name] = $var;
-        }
-
-        return strtr($tplCode, $fmtVars);
+        return Str::renderVars($tplCode, $tplVars, $this->format);
     }
 
     /**
@@ -91,12 +82,12 @@ class SimpleTemplate extends AbstractTemplate
     public function setFormat(string $format): void
     {
         if (!str_contains($format, '%s')) {
-            throw new InvalidArgumentException('var format must contains %s');
+            throw new InvalidArgumentException('template var format must contains %s');
         }
 
         $this->format = $format;
         // get left chars
         [$left, ] = explode('%s', $format);
-        $this->formatLeft = $left;
+        $this->varLeft = $left;
     }
 }
