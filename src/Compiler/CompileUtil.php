@@ -30,23 +30,30 @@ class CompileUtil
     }
 
     /**
-     * convert quick access array key path to php expression.
+     * @var string|null
+     */
+    private static ?string $matchKeyPath = null;
+
+    /**
+     * convert access array key path to php array access expression.
      *
      * - convert $ctx.top.sub to $ctx['top']['sub']
      *
-     * @param string $line
+     * @param string $line var line. must start with $
      *
      * @return string
      */
-    public static function pathToArrayAccess(string $line): string
+    public static function toArrayAccessStmt(string $line): string
     {
-        // - convert $ctx.top.sub to $ctx['top']['sub']
-        $pattern = '~(' . implode(')|(', [
-                '\$[\w.-]+\w', // array key path.
-            ]) . ')~';
+        if (self::$matchKeyPath === null) {
+            // - convert $ctx.top.sub to $ctx['top']['sub']
+            self::$matchKeyPath = '~(' . implode(')|(', [
+                    '\$[\w.-]+\w', // array key path.
+                ]) . ')~';
+        }
 
         // https://www.php.net/manual/zh/reference.pcre.pattern.modifiers.php
-        return preg_replace_callback($pattern, static function (array $matches) {
+        return preg_replace_callback(self::$matchKeyPath, static function (array $matches) {
             $varName = $matches[0];
             // convert $ctx.top.sub to $ctx[top][sub]
             if (str_contains($varName, '.')) {

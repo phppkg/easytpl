@@ -113,7 +113,7 @@ class Token
      */
     public static function getBlockNamePattern(): string
     {
-        // ~^(if|elseif|else|endif|for|endfor|foreach|endforeach)~
+        // ~^(break|continue|switch|case|default|endswitch|foreach|endforeach|for|endfor|if|elseif|else|endif)[^\w-]~
         return self::buildDirectivePattern(self::BLOCK_NAMES);
     }
 
@@ -124,17 +124,17 @@ class Token
      */
     public static function buildDirectivePattern(array $names): string
     {
-        if (!$names) {
-            return '';
-        }
-
-        return '~^(' . implode('|', $names) . ')[^\w-]~';
+        // must with an [^\w-] char
+        return $names ? '~^(' . implode('|', $names) . ')[^\w-]~' : '';
     }
 
     /**
+     * try assert is alone token name.
+     *
      * @param string $str
      *
      * @return string
+     * @see ALONE_TOKENS
      */
     public static function tryAloneToken(string $str): string
     {
@@ -145,6 +145,7 @@ class Token
      * @param string $type
      *
      * @return bool
+     * @see ALONE_TOKENS
      */
     public static function isAloneToken(string $type): bool
     {
@@ -155,6 +156,7 @@ class Token
      * @param string $type
      *
      * @return bool
+     * @see CAN_FIX_TOKENS
      */
     public static function canAutoFixed(string $type): bool
     {

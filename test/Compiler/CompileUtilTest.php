@@ -25,7 +25,7 @@ class CompileUtilTest extends BaseTestCase
 
     public function testPathToArrayAccess(): void
     {
-        $this->assertEquals('ctx.top.sub', CompileUtil::pathToArrayAccess('ctx.top.sub'));
-        $this->assertEquals("\$ctx['top']['sub']", CompileUtil::pathToArrayAccess('$ctx.top.sub'));
+        $this->assertEquals('ctx.top.sub', CompileUtil::toArrayAccessStmt('ctx.top.sub'));
+        $this->assertEquals("\$ctx['top']['sub']", CompileUtil::toArrayAccessStmt('$ctx.top.sub'));
     }
 }

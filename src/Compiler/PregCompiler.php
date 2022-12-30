@@ -10,7 +10,6 @@
 namespace PhpPkg\EasyTpl\Compiler;
 
 use function addslashes;
-use function array_keys;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
@@ -31,6 +30,12 @@ class PregCompiler extends AbstractCompiler
 
     private string $closeTagE = '\}\}';
 
+    /**
+     * like :
+     *  ~^(break|continue|switch|case|default|endswitch|foreach|endforeach|for|endfor|if|elseif|else|endif)[^\w-]~
+     *
+     * @var string
+     */
     private string $blockPattern = '';
 
     private string $directivePattern = '';
@@ -170,7 +175,9 @@ class PregCompiler extends AbstractCompiler
             if ($type === Token::T_ELSE) {
                 $close = ': ' . self::PHP_TAG_CLOSE;
             }
-        } elseif (preg_match($this->blockPattern, $trimmed, $matches)) {
+
+            // TIP: $trimmed . ' ' - always end with an [^\w-] char.
+        } elseif (preg_match($this->blockPattern, $trimmed . ' ', $matches)) {
             // control block: if, for, foreach, define vars, etc
             $type = $matches[1];
             $open = self::PHP_TAG_OPEN . ' ';
@@ -184,7 +191,9 @@ class PregCompiler extends AbstractCompiler
                     $close = ': ' . self::PHP_TAG_CLOSE;
                 }
             }
-        } elseif ($this->directivePattern && preg_match($this->directivePattern, $trimmed, $matches)) {
+
+            // TIP: $trimmed . ' ' - always end with an [^\w-] char.
+        } elseif ($this->directivePattern && preg_match($this->directivePattern, $trimmed . ' ', $matches)) {
             // support user add special directives.
             $directive = $type = $matches[1];
             $handlerFn = $this->customDirectives[$directive];
@@ -217,7 +226,7 @@ class PregCompiler extends AbstractCompiler
 
         // handle quick access array key.
         // - convert $ctx.top.sub to $ctx['top']['sub']
-        $trimmed = CompileUtil::pathToArrayAccess($trimmed);
+        $trimmed = CompileUtil::toArrayAccessStmt($trimmed);
 
         return $open . $trimmed . $close;
     }

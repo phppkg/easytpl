@@ -6,6 +6,7 @@ use PhpPkg\EasyTpl\Compiler\PregCompiler;
 use PhpPkg\EasyTpl\Compiler\Token;
 use PhpPkg\EasyTplTest\BaseTestCase;
 use function preg_match;
+use function vdump;
 
 /**
  * class PregCompilerTest
@@ -38,9 +39,16 @@ class PregCompilerTest extends BaseTestCase
             ['ifA', ''],
             ['if_', ''],
             ['if-', ''],
+            // for
+            ['for ', Token::T_FOR],
+            ['endfor ', Token::T_ENDFOR],
+            ['endfor;', Token::T_ENDFOR],
             // foreach
             ['foreach ', 'foreach'],
-            ['foreach(', 'foreach'],
+            ['foreach(', Token::T_FOREACH],
+            ['endforeach ', Token::T_ENDFOREACH],
+            ['endforeach;', Token::T_ENDFOREACH],
+            ['endforeach; ', Token::T_ENDFOREACH],
             // - error
             ['foreach', ''],
             ['foreachA', ''],
@@ -55,13 +63,14 @@ class PregCompilerTest extends BaseTestCase
         ];
 
         $pattern = Token::getBlockNamePattern();
+        vdump($pattern);
         foreach ($tests as [$in, $out]) {
             $ret = preg_match($pattern, $in, $matches);
             if ($out) {
-                $this->assertEquals(1, $ret);
+                $this->assertEquals(1, $ret, "in: $in, out: $out");
                 $this->assertEquals($out, $matches[1]);
             } else {
-                $this->assertEquals(0, $ret);
+                $this->assertEquals(0, $ret, "in: $in");
             }
         }
     }
@@ -303,6 +312,10 @@ CODE
         $p->addDirective('include', function (string $body, string $name) {
             return '$this->' . $name . $body;
         });
+        $p->addDirective('endblock', function (string $body) {
+            vdump($body);
+            return '$this->endBlock();';
+        });
 
         $tests = [
             ['{{ include("header.tpl") }}', '<?php $this->include("header.tpl") ?>'],
@@ -313,6 +326,8 @@ $this->include("header.tpl", [
    "key1" => "value1",
 ])
 ?>'],
+            ['{{ endblock }}', '<?php $this->endBlock(); ?>'],
+            ['{{ endblock; }}', '<?php $this->endBlock(); ?>'],
         ];
         foreach ($tests as [$in, $out]) {
             $this->assertEquals($out, $p->compile($in));
