@@ -78,13 +78,21 @@ class PregCompilerTest extends BaseTestCase
             ['{{ $name ?: "inhere" }}', '<?= $name ?: "inhere" ?>'],
             ['{{ $name ?? "inhere" }}', '<?= $name ?? "inhere" ?>'],
             ['{{ $name ?? "inhere"; }}', '<?= $name ?? "inhere"; ?>'],
+            // sub key
+            ['{{ ctx.pkgName }}', '<?= $ctx[\'pkgName\'] ?>'],
             ['{{ $ctx.pkgName }}', '<?= $ctx[\'pkgName\'] ?>'],
-            ['{{ $ctx.top1.pkgName }}', '<?= $ctx[\'top1\'][\'pkgName\'] ?>'],
             ['{{ $ctx.pkgName ?? "default" }}', '<?= $ctx[\'pkgName\'] ?? "default" ?>'],
+            ['{{ ctx.pkg-name }}', '<?= $ctx[\'pkg-name\'] ?>'],
             ['{{ $ctx.pkg-name }}', '<?= $ctx[\'pkg-name\'] ?>'],
-            ['{{ $ctx.top1.pkg-name }}', '<?= $ctx[\'top1\'][\'pkg-name\'] ?>'],
-            ['{{ $ctx.top-node.pkg-name }}', '<?= $ctx[\'top-node\'][\'pkg-name\'] ?>'],
+            ['{{ ctx.pkg_name }}', '<?= $ctx[\'pkg_name\'] ?>'],
             ['{{ $ctx.pkg_name }}', '<?= $ctx[\'pkg_name\'] ?>'],
+            // multi parts
+            ['{{ ctx.top1.pkg-name }}', '<?= $ctx[\'top1\'][\'pkg-name\'] ?>'],
+            ['{{ $ctx.top1.pkg-name }}', '<?= $ctx[\'top1\'][\'pkg-name\'] ?>'],
+            ['{{ $ctx.top1.pkgName }}', '<?= $ctx[\'top1\'][\'pkgName\'] ?>'],
+            ['{{ ctx.top-node.pkg-name }}', '<?= $ctx[\'top-node\'][\'pkg-name\'] ?>'],
+            ['{{ $ctx.top-node.pkg-name }}', '<?= $ctx[\'top-node\'][\'pkg-name\'] ?>'],
+            // func
             ['{{ some_func() }}', '<?= some_func() ?>'],
             ['{{ some_func(); }}', '<?= some_func(); ?>'],
             ['{{ $this->include("header.tpl") }}', '<?= $this->include("header.tpl") ?>'],
@@ -126,7 +134,10 @@ CODE
 
         $tests = [
             ['{{ "a" . "b" }}', '<?= "a" . "b" ?>'],
+            ['{{ name | ucfirst }}', '<?= htmlspecialchars((string)ucfirst($name)) ?>'],
             ['{{ $name | ucfirst }}', '<?= htmlspecialchars((string)ucfirst($name)) ?>'],
+            ['{{ user.name | ucfirst }}', '<?= htmlspecialchars((string)ucfirst($user[\'name\'])) ?>'],
+            ['{{ user.first-name | ucfirst }}', '<?= htmlspecialchars((string)ucfirst($user[\'first-name\'])) ?>'],
             [
                 '{{ $name ?: "inhere" | substr:0,3 }}',
                 '<?= htmlspecialchars((string)substr($name ?: "inhere", 0,3)) ?>'

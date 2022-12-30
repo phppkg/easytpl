@@ -9,12 +9,8 @@
 
 namespace PhpPkg\EasyTpl\Compiler;
 
-use Toolkit\Stdlib\Str;
 use function addslashes;
 use function array_keys;
-use function explode;
-use function implode;
-use function is_numeric;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
@@ -34,6 +30,10 @@ class PregCompiler extends AbstractCompiler
     private string $openTagE = '\{\{';
 
     private string $closeTagE = '\}\}';
+
+    private string $blockPattern = '';
+
+    private string $directivePattern = '';
 
     /**
      * @param string $open
@@ -71,6 +71,8 @@ class PregCompiler extends AbstractCompiler
             $tplCode = preg_replace("~$openTagE#.+?#$closeTagE~s", '', $tplCode);
         }
 
+        $this->buildMatchPatterns();
+
         $flags = 0;
         // $flags = PREG_OFFSET_CAPTURE;
         // $flags = PREG_PATTERN_ORDER | PREG_SET_ORDER;
@@ -90,13 +92,37 @@ class PregCompiler extends AbstractCompiler
     }
 
     /**
+     * build match patterns
+     *
+     * @return void
+     */
+    protected function buildMatchPatterns(): void
+    {
+        $this->blockPattern = Token::getBlockNamePattern();
+
+        $this->directivePattern = Token::buildDirectivePattern($this->directiveNames);
+    }
+
+    /**
      * parse code block string.
+     *
+     * ### code blocks
+     *
+     * control stmt block
      *
      * - '=': echo
      * - 'if'
      * - 'for'
      * - 'foreach'
      * - 'switch'
+     * - ... more php keywords
+     *
+     * ### directives
+     *
+     * custom add added directives
+     *
+     * - 'include'
+     * - 'block'
      *
      * @param string $block
      *
@@ -114,11 +140,8 @@ class PregCompiler extends AbstractCompiler
             return self::PHP_TAG_OPEN . ' } ' . self::PHP_TAG_CLOSE;
         }
 
-        $isInline = !str_contains($trimmed, "\n");
-        $kwPattern = Token::getBlockNamePattern();
-
         $directive = '';
-        $userPattern = Token::buildDirectivePattern(array_keys($this->customDirectives));
+        $isInline = !str_contains($trimmed, "\n");
 
         // default is define statement.
         $type  = Token::T_DEFINE;
@@ -147,7 +170,7 @@ class PregCompiler extends AbstractCompiler
             if ($type === Token::T_ELSE) {
                 $close = ': ' . self::PHP_TAG_CLOSE;
             }
-        } elseif (preg_match($kwPattern, $trimmed, $matches)) {
+        } elseif (preg_match($this->blockPattern, $trimmed, $matches)) {
             // control block: if, for, foreach, define vars, etc
             $type = $matches[1];
             $open = self::PHP_TAG_OPEN . ' ';
@@ -161,7 +184,7 @@ class PregCompiler extends AbstractCompiler
                     $close = ': ' . self::PHP_TAG_CLOSE;
                 }
             }
-        } elseif ($userPattern && preg_match($userPattern, $trimmed, $matches)) {
+        } elseif ($this->directivePattern && preg_match($this->directivePattern, $trimmed, $matches)) {
             // support user add special directives.
             $directive = $type = $matches[1];
             $handlerFn = $this->customDirectives[$directive];
@@ -180,43 +203,21 @@ class PregCompiler extends AbstractCompiler
 
         // inline echo support filters
         if ($isInline && $type === Token::T_ECHO) {
-            // auto append var prefix: $
-            if ($trimmed[0] !== '$' && Str::isVarName($trimmed)) {
-                $trimmed = '$' . $trimmed;
-            }
-
             $endChar = $endChar ?: $trimmed[strlen($trimmed) - 1];
+
+            // with filters
             if ($endChar !== ';' && str_contains($trimmed, $this->filterSep)) {
                 $echoBody = substr($trimmed, strlen($eKws));
                 $trimmed  = $eKws . $this->parseInlineFilters($echoBody);
+            } elseif (CompileUtil::canAddVarPrefix($trimmed)) {
+                // auto append var prefix: $
+                $trimmed = self::VAR_PREFIX . $trimmed;
             }
         }
 
-        // handle
-        // - convert $ctx.top.sub to $ctx[top][sub]
-        $pattern = '~(' . implode(')|(', [
-                '\$[\w.-]+\w', // array key path.
-            ]) . ')~';
-
-        // https://www.php.net/manual/zh/reference.pcre.pattern.modifiers.php
-        $trimmed = preg_replace_callback($pattern, static function (array $matches) {
-            $varName = $matches[0];
-            // convert $ctx.top.sub to $ctx[top][sub]
-            if (str_contains($varName, '.')) {
-                $nodes = [];
-                foreach (explode('.', $varName) as $key) {
-                    if ($key[0] === '$') {
-                        $nodes[] = $key;
-                    } else {
-                        $nodes[] = is_numeric($key) ? "[$key]" : "['$key']";
-                    }
-                }
-
-                $varName = implode('', $nodes);
-            }
-
-            return $varName;
-        }, $trimmed);
+        // handle quick access array key.
+        // - convert $ctx.top.sub to $ctx['top']['sub']
+        $trimmed = CompileUtil::pathToArrayAccess($trimmed);
 
         return $open . $trimmed . $close;
     }

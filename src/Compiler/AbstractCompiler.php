@@ -39,11 +39,13 @@ abstract class AbstractCompiler implements CompilerInterface
 
     public const PHP_TAG_CLOSE = '?>';
 
+    public const RAW_OUTPUT = 'raw';
+
+    public const VAR_PREFIX = '$';
+
     public string $openTag = '{{';
 
     public string $closeTag = '}}';
-
-    public const RAW_OUTPUT = 'raw';
 
     /**
      * @var string
@@ -74,6 +76,8 @@ abstract class AbstractCompiler implements CompilerInterface
      * custom directive, control statement token.
      *
      * -----
+     *
+     * ### Examples
      * eg: implements: `include('parts/header.tpl')`
      *
      * ```php
@@ -86,7 +90,12 @@ abstract class AbstractCompiler implements CompilerInterface
      *
      * @var array{string, callable(string, string): string}
      */
-    public array $customDirectives = [];
+    protected array $customDirectives = [];
+
+    /**
+     * @var array
+     */
+    protected array $directiveNames = [];
 
     /**
      * @return static
@@ -123,6 +132,8 @@ abstract class AbstractCompiler implements CompilerInterface
     }
 
     /**
+     * parse inline filters
+     *
      * @param string $echoBody
      *
      * @return string
@@ -134,7 +145,12 @@ abstract class AbstractCompiler implements CompilerInterface
         }
 
         $filters = Str::explode($echoBody, $this->filterSep);
+
+        // first is real echo body.
         $newExpr = array_shift($filters);
+        if (CompileUtil::canAddVarPrefix($newExpr)) {
+            $newExpr = self::VAR_PREFIX . $newExpr;
+        }
 
         foreach ($filters as $filter) {
             if ($filter === self::RAW_OUTPUT) {
@@ -205,8 +221,18 @@ abstract class AbstractCompiler implements CompilerInterface
      */
     public function addDirective(string $name, callable $handler): static
     {
+        $this->directiveNames[] = $name;
         $this->customDirectives[$name] = $handler;
+
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDirectiveNames(): array
+    {
+        return $this->directiveNames;
     }
 
     /**
