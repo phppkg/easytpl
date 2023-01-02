@@ -1,5 +1,5 @@
 {{ block 'header' }}
-    on layout: block header;
+on layout: block header;
 {{ endblock }}
 
 this is an layout file.
