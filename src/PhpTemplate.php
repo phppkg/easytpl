@@ -10,6 +10,7 @@
 namespace PhpPkg\EasyTpl;
 
 use InvalidArgumentException;
+use PhpPkg\EasyTpl\Concern\AbstractTemplate;
 use RuntimeException;
 use Throwable;
 use Toolkit\FsUtil\Dir;
@@ -21,7 +22,7 @@ use function extract;
 use function file_exists;
 use function file_put_contents;
 use function md5;
-use function ob_clean;
+use function ob_end_clean;
 use function ob_get_clean;
 use function ob_start;
 use function sprintf;
@@ -96,7 +97,7 @@ class PhpTemplate extends AbstractTemplate
             require $tplFile;
             return ob_get_clean();
         } catch (Throwable $e) {
-            ob_clean();
+            ob_end_clean();
             throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
     }

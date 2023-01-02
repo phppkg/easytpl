@@ -7,7 +7,7 @@
  * @license  MIT
  */
 
-namespace PhpPkg\EasyTpl;
+namespace PhpPkg\EasyTpl\Concern;
 
 use InvalidArgumentException;
 use PhpPkg\EasyTpl\Contract\TemplateInterface;
@@ -21,7 +21,6 @@ use function strpos;
  * Class AbstractTemplate
  *
  * @author inhere
- * @package PhpPkg\EasyTpl
  */
 abstract class AbstractTemplate implements TemplateInterface
 {

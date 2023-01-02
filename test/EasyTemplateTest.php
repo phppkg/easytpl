@@ -12,19 +12,6 @@ use function vdump;
  */
 class EasyTemplateTest extends BaseTestCase
 {
-    private array $tplVars = [
-        'int' => 23,
-        'str' => 'a string',
-        'arr' => [
-             'inhere',
-             20,
-        ],
-        'map' => [
-            'name' => 'inhere',
-            'age'  => 20,
-        ],
-    ];
-
     private function newTemplate(): EasyTemplate
     {
         return new EasyTemplate([

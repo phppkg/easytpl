@@ -10,6 +10,7 @@
 namespace PhpPkg\EasyTpl;
 
 use InvalidArgumentException;
+use PhpPkg\EasyTpl\Concern\AbstractTemplate;
 use Toolkit\Stdlib\Str;
 use function array_merge;
 use function explode;

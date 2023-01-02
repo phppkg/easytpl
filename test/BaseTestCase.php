@@ -7,13 +7,37 @@ use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
 use Throwable;
-use function dirname;
 
 /**
  * Class BaseTestCase
  */
 abstract class BaseTestCase extends TestCase
 {
+    protected array $tplVars = [
+        'int' => 23,
+        'str' => 'a string',
+        'arr' => [
+            'inhere',
+            20,
+        ],
+        'map' => [
+            'name' => 'inhere',
+            'age'  => 20,
+        ],
+    ];
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function getTestdataPath(string $path): string
+    {
+        $dirPath = __DIR__ . '/testdata';
+
+        return $path ? $dirPath . '/' . $path : $dirPath;
+    }
+
     /**
      * @param string $path
      *

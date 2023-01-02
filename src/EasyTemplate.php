@@ -34,7 +34,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     /**
      * @var CompilerInterface
      */
-    private CompilerInterface $compiler;
+    protected CompilerInterface $compiler;
 
     /**
      * Custom filter for handle result(only for echo body).
@@ -95,13 +95,13 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
         ]);
 
         // add directive: include
-        $compiler->addDirective(
-            'include',
-            function (string $body, string $name) {
-                /** will call {@see include()} */
-                return '$this->' . $name . $body;
-            }
-        );
+        $compiler->addDirective('include', function (string $body) {
+            /**
+             * like: $this->include('path/to/file.tpl')
+             * will call {@see include()}
+             */
+            return '$this->include' . $body;
+        });
     }
 
     /**
