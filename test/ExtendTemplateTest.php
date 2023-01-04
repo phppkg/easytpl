@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace PhpPkg\EasyTplTest\Extra;
+namespace PhpPkg\EasyTplTest;
 
-use PhpPkg\EasyTpl\Extra\ExtendTemplate;
-use PhpPkg\EasyTplTest\BaseTestCase;
+use PhpPkg\EasyTpl\ExtendTemplate;
 
 /**
  * class ExtendTemplateTest
@@ -30,6 +29,13 @@ class ExtendTemplateTest extends BaseTestCase
         $this->assertStringContainsString('on layout: block header;', $str);
         $this->assertStringContainsString('on home: block body;', $str);
         $this->assertStringContainsString('on home: block footer;', $str);
+
+        $tplFile = $this->getTestdataPath('extends/home1.tpl');
+
+        $str = $et->renderFile($tplFile, $this->tplVars);
+        $this->assertStringContainsString('on layout: block header - name: inhere.', $str);
+        $this->assertStringContainsString('on home: block body - age: 20.', $str);
+        $this->assertStringContainsString('on home: block footer - city: chengdu.', $str);
     }
 
     public function testExtend_renderString(): void
@@ -38,21 +44,21 @@ class ExtendTemplateTest extends BaseTestCase
 
         $tplCode = <<<TPL
 {{ block 'first' }}
-content int first block
+content int first block.
 {{ endblock }}
 TPL;
 
         $str = $et->renderString($tplCode);
-        $this->assertEquals("content int first block\n", $str);
+        $this->assertEquals("content int first block.\n", $str);
 
         $tplCode = <<<TPL
 {{ block 'first' }}
-content int first block
+my name is {{ name }}.
 {{ endblock }}
 TPL;
 
-        $str = $et->renderString($tplCode);
-        $this->assertEquals("content int first block\n", $str);
+        $str = $et->renderString($tplCode, $this->tplVars);
+        $this->assertEquals("my name is inhere1.\n", $str);
     }
 
     public function testExtend_renderString_error(): void

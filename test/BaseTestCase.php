@@ -14,15 +14,22 @@ use Throwable;
 abstract class BaseTestCase extends TestCase
 {
     protected array $tplVars = [
-        'int' => 23,
-        'str' => 'a string',
-        'arr' => [
+        'int'  => 23,
+        'str'  => 'a string',
+        'name' => 'inhere1',
+        'tags' => ['php', 'java'],
+        'arr'  => [
             'inhere',
             20,
         ],
-        'map' => [
+        'map'  => [
             'name' => 'inhere',
             'age'  => 20,
+        ],
+        'info'  => [
+            'name' => 'inhere',
+            'age'  => 20,
+            'city' => 'chengdu',
         ],
     ];
 

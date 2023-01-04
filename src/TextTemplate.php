@@ -15,6 +15,7 @@ use PhpPkg\EasyTpl\Contract\CompilerInterface;
  * class TextTemplate
  *
  * @author inhere
+ * @deprecated please use {@see EasyTemplate::textTemplate() }
  */
 class TextTemplate extends EasyTemplate
 {

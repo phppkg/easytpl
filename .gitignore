@@ -20,3 +20,4 @@ vendor/
 bin/php-cs-fixer
 /plugin/local/
 node_modules/
+*caches/

@@ -7,10 +7,11 @@
  * @license  MIT
  */
 
-namespace PhpPkg\EasyTpl\Extra;
+namespace PhpPkg\EasyTpl;
 
+use InvalidArgumentException;
+use PhpPkg\EasyTpl\Concern\CompiledTemplateTrait;
 use PhpPkg\EasyTpl\Contract\CompilerInterface;
-use PhpPkg\EasyTpl\EasyTemplate;
 use RuntimeException;
 use Throwable;
 use Toolkit\Stdlib\Helper\Assert;
@@ -63,9 +64,9 @@ use function trim;
  * footer contents in layout main.
  * ```
  */
-class ExtendTemplate extends EasyTemplate
+class ExtendTemplate extends PhpTemplate
 {
-    public const BLOCK_PREFIX = 'ET_BLOCK_';
+    use CompiledTemplateTrait;
 
     /**
      * @var self|null
@@ -75,19 +76,50 @@ class ExtendTemplate extends EasyTemplate
     // private string $extendTpl = '';
 
     /**
+     * @var string[]
+     */
+    protected array $allowExt = ['.html', '.phtml', '.php', '.tpl'];
+
+    /**
      * @var string current block name.
      */
     private string $currentBlock = '';
+
+    /**
+     * Class constructor.
+     *
+     * @param array{tmpDir: string, compiler: class-string|CompilerInterface} $config
+     */
+    public function __construct(array $config = [])
+    {
+        // create compiler
+        $compiler = $this->createCompiler($config);
+
+        parent::__construct($config);
+
+        // set and init
+        $this->setCompiler($compiler);
+        $this->initCompiler($compiler);
+    }
+
+    /**
+     * @param CompilerInterface $compiler
+     */
+    protected function initCompiler(CompilerInterface $compiler): void
+    {
+        // add built-in filters
+        $this->loadBuiltInFilters();
+
+        $this->initDirectives($compiler);
+    }
 
     /**
      * @param CompilerInterface $compiler
      *
      * @return void
      */
-    protected function initCompiler(CompilerInterface $compiler): void
+    protected function initDirectives(CompilerInterface $compiler): void
     {
-        parent::initCompiler($compiler);
-
         $extendFn = function (string $body) {
             $body = trim($body, '() ');
             return sprintf('$this->extends(%s)', $body);
@@ -113,18 +145,20 @@ class ExtendTemplate extends EasyTemplate
      * @param array $tplVars
      *
      * @return string
-     * @noinspection PhpDocMissingThrowsInspection
-     * @noinspection PhpUnhandledExceptionInspection
      */
     public function renderFile(string $tplFile, array $tplVars = []): string
     {
         try {
-            parent::renderFile($tplFile, $tplVars);
+            $phpFile = $this->compileFile($tplFile);
 
-            $this->resetContext();
+            $this->doRenderFile($phpFile, $tplVars);
         } catch (Throwable $e) {
             $this->resetContext(true);
-            throw $e;
+
+            if ($e instanceof RuntimeException || $e instanceof InvalidArgumentException) {
+                throw $e;
+            }
+            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
         $blockName = $this->currentBlock;
@@ -133,10 +167,11 @@ class ExtendTemplate extends EasyTemplate
         // if use extends() on tpl file.
         if ($this->extendEt) {
             $contents = array_merge($this->extendEt->blockContents, $this->blockContents);
-            // reset runtime property.
-            $this->extendEt = null;
+            $this->resetContext();
         } else {
             $contents = $this->blockContents;
+            // tip: cannot reset property, it will used on parent renderFile();
+            $this->currentBlock = '';
         }
 
         return implode("\n", $contents);
@@ -149,21 +184,26 @@ class ExtendTemplate extends EasyTemplate
      * @param array $tplVars
      *
      * @return string
-     * @noinspection PhpDocMissingThrowsInspection
-     * @noinspection PhpUnhandledExceptionInspection
      */
     public function renderString(string $tplCode, array $tplVars = []): string
     {
+        $tplCode = $this->compiler->compile($tplCode);
+
         try {
             parent::renderString($tplCode, $tplVars);
-
-            $this->resetContext();
         } catch (Throwable $e) {
             $this->resetContext(true);
-            throw $e;
+
+            if ($e instanceof RuntimeException || $e instanceof InvalidArgumentException) {
+                throw $e;
+            }
+            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return implode("\n", $this->blockContents);
+        $rendered = implode("\n", $this->blockContents);
+        $this->resetContext();
+
+        return $rendered;
     }
 
     /**
@@ -204,11 +244,10 @@ class ExtendTemplate extends EasyTemplate
      * Start new block
      *
      * @param string $name block name.
-     * @param array $tplVars TODO
      *
      * @return void
      */
-    protected function startBlock(string $name, array $tplVars = []): void
+    protected function startBlock(string $name): void
     {
         Assert::notBlank($name, 'block name is required');
 

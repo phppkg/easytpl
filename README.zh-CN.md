@@ -14,15 +14,18 @@
   - 无学习成本
   - 仅仅简单处理并转换为原生PHP语法
   - 兼容PHP原生语法使用
-- 更加简单的输出语法。 例如：`{{= $var }}` `{{ $var }}` `{{ echo $var }}`
-- 支持所有控制语法。 例如 `if,elseif,else;foreach;for;switch`
+- 更加简单的输出语法。 例如：`{{ var }}` `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
+  - 允许忽略前缀 `$`，将在编译时自动追加
 - 支持链式访问数组值。 例如：`{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
+- 支持所有控制语法。 例如 `if,elseif,else;foreach;for;switch`
+- 支持使用PHP内置函数作为过滤器。 例如：`{{ $var | ucfirst }}` `{{ date('Y-m-d') }}`
 - 更加安全，默认会自动通过 `htmlspecialchars` 将输出结果进行处理
   - 除非设置了禁用或者手动使用 `raw` 过滤器
-- 支持使用PHP内置函数作为过滤器。 例如：`{{ $var | ucfirst }}`
 - 支持添加自定义过滤器
   - 默认内置过滤器：`upper` `lower` `nl`
 - 支持添加自定义指令，提供自定义功能
+  - `EasyTemplate` 内置支持 `include` `contents`
+  - `ExtendTemplate` 提供模板继承功能. 内置支持 `extends` `block` `endblock`
 - 支持模板中添加注释。 例如: `{{# comments ... #}}`
 
 ## 安装
@@ -300,21 +303,70 @@ $tpl->addFilters([
 
 ```php
 $tpl = EasyTemplate::new();
-$tpl->addDirective(
-    'include',
-    function (string $body, string $name) {
-        /** will call {@see EasyTemplate::include()} */
-        return '$this->' . $name . $body;
-    }
-);
+$tpl->addDirective('include',function (string $body, string $name) {
+    /** will call {@see EasyTemplate::include()} */
+    return '$this->include' . $body;
+});
 ```
 
-在模板中使用:
+**在模板中使用**:
 
 ```php
-
 {{ include('part/header.tpl', ['title' => 'My world']) }}
+```
 
+## `extend` 模板
+
+新增指令:
+
+- `extends` 定义继承一个父模板.
+  - 语法: `{{ extends('layouts/main.tpl') }}`
+- `block` 定义开始一个新的模板块.
+  - 语法: `{{ block 'header' }}`
+- `endblock` 标记一个模板块结束.
+  - 语法: `{{ endblock }}`
+
+```php
+use PhpPkg\EasyTpl\ExtendTemplate;
+
+$et = new ExtendTemplate();
+$et->render('home/index.tpl');
+```
+
+### `extend` 模板使用示例
+
+- 基础布局文件: `layouts/main.tpl`
+
+```php
+{{ block 'header' }}
+header contents in layout main.
+{{ endblock }}
+
+{{ block 'body' }}
+body contents in layout main.
+{{ endblock }}
+
+{{ block 'footer' }}
+footer contents in layout main.
+{{ endblock }}
+```
+
+- 具体页面文件: `home/index.tpl`
+
+```php
+{{ extends('layouts/main.tpl') }}
+
+{{ block 'body' }}
+body contents in home index.
+{{ endblock }}
+```
+
+**渲染结果**
+
+```text
+header contents in layout main.
+body contents in home index.
+footer contents in layout main.
 ```
 
 ## Dep packages

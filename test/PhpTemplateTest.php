@@ -33,7 +33,7 @@ class PhpTemplateTest extends BaseTestCase
         $e = $this->runAndGetException(function (PhpTemplate $t, $tplFile, $tplVars) {
             $t->renderFile($tplFile, $tplVars);
         }, $t, $tplFile, $tplVars);
-        $this->assertEquals('no found template file: gen-go-funcs.php', $e->getMessage());
+        $this->assertEquals('no such template file: gen-go-funcs.php', $e->getMessage());
 
         $t->setTplDir(__DIR__ . '/testdata');
         $result = $t->renderFile($tplFile, $tplVars);

@@ -245,4 +245,16 @@ My develop tags:
         $this->assertStringContainsString('Title: Use Include Example', $result);
         // vdump($result);
     }
+
+    public function testCompileCode_noEchoFilter(): void
+    {
+        $t = EasyTemplate::textTemplate();
+
+        $code = '{{ $name | upper }}';
+        $out = '<?= strtoupper($name) ?>';
+        $this->assertEquals($out, $t->compileCode($code));
+        $this->assertEquals('INHERE', $t->renderString($code, [
+            'name' => 'inhere',
+        ]));
+    }
 }

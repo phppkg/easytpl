@@ -6,7 +6,7 @@
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
 [![zh-CN readme](https://img.shields.io/badge/中文-Readme-brightgreen.svg?style=for-the-badge&maxAge=2592000)](README.zh-CN.md)
 
-⚡️ Simple and fastly template engine for PHP
+⚡️ Simple and fastly template engine for PHP.
 
 ## Features
 
@@ -14,15 +14,18 @@
   - No learning costs, syntax like PHP template
   - It is simply processed and converted into native PHP syntax
   - Compatible with PHP native syntax
-- support simple echo print syntax. eg: `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
-- support all control syntax. such as `if,elseif,else;foreach;for;switch`
+- support simple echo print syntax. eg: `{{ var }}` `{{= $var }}` `{{ $var }}` `{{ echo $var }}`
+  - allow ignore prefix `$`, will auto append on compile.
 - support chained access array value. eg: `{{ $arr.0 }}` `{{ $map.name }}` `{{ $map.user.name }}`
+- support all control syntax. such as `if,elseif,else;foreach;for;switch`
+- support php builtin function as filters. eg: `{{ $var | ucfirst }}`  `{{ date('Y-m-d') }}`
 - More secure, the output will be processed automatically through `htmlspecialchars` by default
   - You can set to disable output filtering or manually use the `raw` filter
-- support php builtin function as filters. eg: `{{ $var | ucfirst }}`
 - support add custom filters.
   - default builtin filters: `upper` `lower` `nl`
 - support add custom directive.
+  - `EasyTemplate` built in support `include`: `{{ include('parts/header.tpl') }}`
+  - `ExtendTemplate` built in support `extends` `block` `endblock`
 - support comments in templates. eg: `{{# comments ... #}}`
 
 ## Install
@@ -305,17 +308,69 @@ $tpl->addDirective(
     'include',
     function (string $body, string $name) {
         /** will call {@see EasyTemplate::include()} */
-        return '$this->' . $name . $body;
+        return '$this->include' . $body;
     }
 );
 ```
 
-Use in template:
+**Use in template**
 
 ```php
-
 {{ include('part/header.tpl', ['title' => 'My world']) }}
+```
 
+## Extends template
+
+New directives:
+
+- `extends` extends a layout template file.
+  - syntax: `{{ extends('layouts/main.tpl') }}`
+- `block` define a new template block start.
+  - syntax: `{{ block 'header' }}`
+- `endblock` mark a block end.
+  - syntax: `{{ endblock }}`
+
+```php
+use PhpPkg\EasyTpl\ExtendTemplate;
+
+$et = new ExtendTemplate();
+$et->render('home/index.tpl');
+```
+
+### Examples for extend
+
+- on layout file: `layouts/main.tpl`
+
+```php
+{{ block 'header' }}
+header contents in layout main.
+{{ endblock }}
+
+{{ block 'body' }}
+body contents in layout main.
+{{ endblock }}
+
+{{ block 'footer' }}
+footer contents in layout main.
+{{ endblock }}
+```
+
+- on page file: `home/index.tpl`
+
+```php
+{{ extends('layouts/main.tpl') }}
+
+{{ block 'body' }}
+body contents in home index.
+{{ endblock }}
+```
+
+**Rendered results**
+
+```text
+header contents in layout main.
+body contents in home index.
+footer contents in layout main.
 ```
 
 ## Dep packages
