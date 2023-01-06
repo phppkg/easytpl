@@ -2,6 +2,10 @@
 
 namespace PhpPkg\EasyTpl\Compiler;
 
+use function defined;
+use function str_contains;
+use function str_starts_with;
+
 /**
  * class CompileUtil
  *
@@ -26,7 +30,22 @@ class CompileUtil
      */
     public static function canAddVarPrefix(string $line): bool
     {
-        return $line[0] !== '$' && preg_match(self::REGEX_VAR_NAME, $line) === 1;
+        // has prefix or is magic const. (eg: __LINE__)
+        if ($line[0] === '$' || str_starts_with($line, '__')) {
+            return false;
+        }
+
+        if (preg_match(self::REGEX_VAR_NAME, $line) === 1) {
+            if (str_contains($line, '.') || str_contains($line, '-')) {
+                return true;
+            }
+
+            // up: check is const name
+            // - defined() cannot check magic const. (eg: __LINE__)
+            return !defined($line);
+        }
+
+        return false;
     }
 
     /**

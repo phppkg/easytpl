@@ -63,7 +63,7 @@ class PregCompilerTest extends BaseTestCase
         ];
 
         $pattern = Token::getBlockNamePattern();
-        vdump($pattern);
+        // vdump($pattern);
         foreach ($tests as [$in, $out]) {
             $ret = preg_match($pattern, $in, $matches);
             if ($out) {
@@ -79,10 +79,27 @@ class PregCompilerTest extends BaseTestCase
     {
         $p = new PregCompiler();
 
+        $this->assertNotEquals('<?= $name ?>', $p->compile('{{= name }}'));
+
         $tests = [
             ['{{ "a" . "b" }}', '<?= "a" . "b" ?>'],
+            // const
+            ['{{ PHP_OS }}', '<?= PHP_OS ?>'],
+            ['{{= PHP_OS }}', '<?= PHP_OS ?>'],
+            ["{{\n PHP_OS }}", "<?= PHP_OS ?>"],
+            ['{{ echo PHP_OS }}', '<?php echo PHP_OS ?>'],
+            ['{{ __LINE__ }}', '<?= __LINE__ ?>'],
+            ['{{= __LINE__ }}', '<?= __LINE__ ?>'],
+            ['{{ echo __LINE__ }}', '<?php echo __LINE__ ?>'],
+            ['{{ SomeClass::NAME }}', '<?= SomeClass::NAME ?>'],
+            ['{{ echo SomeClass::NAME }}', '<?= SomeClass::NAME ?>'],
+            // prop
+            ['{{ SomeClass::$name }}', '<?= SomeClass::$name ?>'],
+            // var
             ['{{ name }}', '<?= $name ?>'],
             ['{{ $name }}', '<?= $name ?>'],
+            ['{{= $name }}', '<?= $name ?>'],
+            ['{{ echo $name }}', '<?php echo $name ?>'],
             ['{{ $name; }}', '<?= $name; ?>'],
             ['{{ $name ?: "inhere" }}', '<?= $name ?: "inhere" ?>'],
             ['{{ $name ?? "inhere" }}', '<?= $name ?? "inhere" ?>'],
@@ -104,37 +121,21 @@ class PregCompilerTest extends BaseTestCase
             // func
             ['{{ some_func() }}', '<?= some_func() ?>'],
             ['{{ some_func(); }}', '<?= some_func(); ?>'],
+            ['{{ SomeClass::func(); }}', '<?= SomeClass::func(); ?>'],
             ['{{ $this->include("header.tpl") }}', '<?= $this->include("header.tpl") ?>'],
+            // more
+            [
+                '{{= $ctx.pkgName ?? "org.example.entity" }}',
+                '<?= $ctx[\'pkgName\'] ?? "org.example.entity" ?>'
+            ],
+            [
+                '{{= $ctx->pkgName ?? "org.example.entity" }}',
+                '<?= $ctx->pkgName ?? "org.example.entity" ?>'
+            ],
         ];
         foreach ($tests as [$in, $out]) {
             $this->assertEquals($out, $p->compile($in));
         }
-
-        $tplCode = <<<'TPL'
-
-{{= $ctx.pkgName ?? "org.example.entity" }}
-
-TPL;
-        $compiled = $p->compile($tplCode);
-        // vdump($tplCode, $compiled);
-        $this->assertNotEmpty($compiled);
-        $this->assertEquals(<<<'CODE'
-
-<?= $ctx['pkgName'] ?? "org.example.entity" ?>
-
-CODE
-            ,$compiled);
-
-        $tplCode = <<<'TPL'
-{{= $ctx->pkgName ?? "org.example.entity" }}
-TPL;
-        $compiled = $p->compile($tplCode);
-        // vdump($tplCode, $compiled);
-        $this->assertNotEmpty($compiled);
-        $this->assertEquals(<<<'CODE'
-<?= $ctx->pkgName ?? "org.example.entity" ?>
-CODE
-            ,$compiled);
     }
 
     public function testCompile_inline_echo_with_filters():void
@@ -180,6 +181,38 @@ CODE
         foreach ($tests as [$in, $out]) {
             $this->assertEquals($out, $p->compile($in));
         }
+    }
+
+    public function testCompile_ml_define():void
+    {
+        $p = new PregCompiler();
+
+        $code = <<<'CODE'
+{{
+
+$a = random_int(1, 10);
+}}
+CODE;
+        $compiled = $p->compile($code);
+        $this->assertEquals(<<<'CODE'
+<?php $a = random_int(1, 10); ?>
+CODE
+            ,$compiled);
+
+        $code = <<<'CODE'
+{{
+// comments
+$a = random_int(1, 10);
+}}
+CODE;
+        $compiled = $p->compile($code);
+        $this->assertEquals(<<<'CODE'
+<?php
+// comments
+$a = random_int(1, 10);
+?>
+CODE
+            ,$compiled);
     }
 
     public function testCompile_comments():void
@@ -270,38 +303,6 @@ CODE;
 - <?= $tag ?>
 
 <?php endforeach ?>
-CODE
-            ,$compiled);
-    }
-
-    public function testCompile_ml_define():void
-    {
-        $p = new PregCompiler();
-
-        $code = <<<'CODE'
-{{
-
-$a = random_int(1, 10);
-}}
-CODE;
-        $compiled = $p->compile($code);
-        $this->assertEquals(<<<'CODE'
-<?php $a = random_int(1, 10); ?>
-CODE
-            ,$compiled);
-
-        $code = <<<'CODE'
-{{
-// comments
-$a = random_int(1, 10);
-}}
-CODE;
-        $compiled = $p->compile($code);
-        $this->assertEquals(<<<'CODE'
-<?php
-// comments
-$a = random_int(1, 10);
-?>
 CODE
             ,$compiled);
     }

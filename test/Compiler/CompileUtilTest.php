@@ -21,6 +21,8 @@ class CompileUtilTest extends BaseTestCase
 
         $this->assertFalse(CompileUtil::canAddVarPrefix("top['abc']"));
         $this->assertFalse(CompileUtil::canAddVarPrefix('abc()'));
+        $this->assertFalse(CompileUtil::canAddVarPrefix('PHP_OS'));
+        $this->assertFalse(CompileUtil::canAddVarPrefix('__LINE__'));
     }
 
     public function testPathToArrayAccess(): void
