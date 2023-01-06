@@ -92,6 +92,7 @@ class PhpTemplate extends AbstractTemplate
         }
 
         ob_start();
+        /** @noinspection PhpRedundantOptionalArgumentInspection */
         extract($tplVars, EXTR_OVERWRITE);
         try {
             require $tplFile;

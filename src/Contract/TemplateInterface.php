@@ -17,18 +17,38 @@ namespace PhpPkg\EasyTpl\Contract;
  */
 interface TemplateInterface
 {
-    /**
-     * Render template file and output
+    /*
+     * Render template file and output result.
      *
      * @param string $tplFile
      * @param array  $tplVars
      *
      * @return void
      */
-    public function render(string $tplFile, array $tplVars): void;
+    public function display(string $tplFile, array $tplVars): void;
+
+    /*
+     * Render template file and output result.
+     *
+     * @param string $tplFile
+     * @param array  $tplVars
+     *
+     * @return void
+     */
+    public function displayFile(string $tplFile, array $tplVars): void;
 
     /**
-     * Render template file to string
+     * Render template file to string.
+     *
+     * @param string $tplFile
+     * @param array  $tplVars
+     *
+     * @return string
+     */
+    public function render(string $tplFile, array $tplVars): string;
+
+    /**
+     * Render template file to string.
      *
      * @param string $tplFile
      * @param array  $tplVars

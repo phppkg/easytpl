@@ -99,9 +99,29 @@ abstract class AbstractTemplate implements TemplateInterface
      * @param string $tplFile
      * @param array $tplVars
      */
-    public function render(string $tplFile, array $tplVars = []): void
+    public function display(string $tplFile, array $tplVars = []): void
+    {
+        echo $this->render($tplFile, $tplVars);
+    }
+
+    /**
+     * @param string $tplFile
+     * @param array $tplVars
+     */
+    public function displayFile(string $tplFile, array $tplVars = []): void
     {
         echo $this->renderFile($tplFile, $tplVars);
+    }
+
+    /**
+     * @param string $tplFile
+     * @param array $tplVars
+     *
+     * @return string
+     */
+    public function render(string $tplFile, array $tplVars = []): string
+    {
+        return $this->renderFile($tplFile, $tplVars);
     }
 
     /**

@@ -12,6 +12,7 @@ namespace PhpPkg\EasyTpl;
 use PhpPkg\EasyTpl\Concern\CompiledTemplateTrait;
 use PhpPkg\EasyTpl\Contract\CompilerInterface;
 use PhpPkg\EasyTpl\Contract\EasyTemplateInterface;
+use function str_replace;
 
 /**
  * Class EasyTemplate
@@ -69,6 +70,8 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
 {
     use CompiledTemplateTrait;
 
+    public const MAIN_CONTENT_MARK = '{_MAIN_CONTENT_}';
+
     /**
      * @var string[]
      */
@@ -87,6 +90,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
      * @var string
      */
     private string $currentLayout = '';
+    private string $layoutContent = '';
 
     /**
      * Create a text template engine instance.
@@ -142,18 +146,50 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
             /** will call {@see include()} */
             return '$this->include' . $body;
         })
-            // use layout file. syntax: {{ layout('layouts/main.tpl') }}
+            // use layout file. syntax: {{ layout('layouts/main.tpl', ['name' => 'inhere']) }}
             ->addDirective('layout', function (string $body) {
                 /** will call {@see useLayout()} */
                 return '$this->useLayout' . $body;
             })
             // use on layout file. syntax: {{ contents }}
-            ->addDirective('contents', function () {
-                return '{_MAIN_CONTENT_}';
-            });
+            ->addDirective('contents', fn() => self::MAIN_CONTENT_MARK);
     }
 
     /**
+     * Render template file, support `layout()` and $this->defaultLayout.
+     *
+     * @param string $tplFile
+     * @param array $tplVars
+     *
+     * @return string
+     */
+    public function render(string $tplFile, array $tplVars = []): string
+    {
+        $phpFile = $this->compileFile($tplFile);
+        $contents = $this->doRenderFile($phpFile, $tplVars);
+
+        $useLayout = false;
+        if ($this->currentLayout) {
+            $useLayout = true;
+        } elseif ($this->defaultLayout) {
+            $useLayout = true;
+            $this->useLayout($this->defaultLayout);
+        }
+
+        // use layout
+        if ($useLayout) {
+            $contents = str_replace(self::MAIN_CONTENT_MARK, $contents, $this->layoutContent);
+
+            // reset context
+            $this->currentLayout = $this->layoutContent = '';
+        }
+
+        return $contents;
+    }
+
+    /**
+     * Render view file, support layout(), but not apply $this->defaultLayout.
+     *
      * @param string $tplFile
      * @param array $tplVars
      *
@@ -162,8 +198,17 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     public function renderFile(string $tplFile, array $tplVars = []): string
     {
         $phpFile = $this->compileFile($tplFile);
+        $contents = $this->doRenderFile($phpFile, $tplVars);
 
-        return $this->doRenderFile($phpFile, $tplVars);
+        // use layout
+        if ($this->currentLayout) {
+            $contents = str_replace(self::MAIN_CONTENT_MARK, $contents, $this->layoutContent);
+
+            // reset context
+            $this->currentLayout = $this->layoutContent = '';
+        }
+
+        return $contents;
     }
 
     /**
@@ -191,6 +236,20 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
         $phpFile = $this->compileFile($tplFile);
 
         echo $this->doRenderFile($phpFile, $tplVars);
+    }
+
+    /**
+     * use and render layout file
+     *
+     * @param string $layoutFile
+     * @param array $tplVars
+     *
+     * @return void
+     */
+    protected function useLayout(string $layoutFile, array $tplVars = []): void
+    {
+        $this->currentLayout = $layoutFile;
+        $this->layoutContent = $this->renderFile($layoutFile, $tplVars);
     }
 
     /**
