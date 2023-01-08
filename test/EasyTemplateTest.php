@@ -263,8 +263,10 @@ My develop tags:
 
         $t = $this->newTemplate();
         $s = $t->render($tplFile);
-        vdump($s);
         $this->assertNotEmpty($s);
+        vdump($s);
+        $this->assertStringContainsString('on layout: template header;', $s);
+        $this->assertStringContainsString('on home: template body;', $s);
     }
 
     public function testEasy_useLayout02(): void
@@ -274,5 +276,7 @@ My develop tags:
         $t = $this->newTemplate();
         $s = $t->render($tplFile, $this->tplVars);
         $this->assertNotEmpty($s);
+        $this->assertStringContainsString('on layout: template header - name: inhere.', $s);
+        $this->assertStringContainsString('on home: template body - age: 20.', $s);
     }
 }

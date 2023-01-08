@@ -1,3 +1,3 @@
-{{ layout('layouts/layout01.tpl', ['info' => $info]) }}
+{{ layout('layouts/layout02.tpl', ['info' => $info]) }}
 
-on home: block body;
+on home: template body - age: {{ info.age }}.

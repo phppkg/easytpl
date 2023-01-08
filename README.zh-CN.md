@@ -24,8 +24,8 @@
 - 支持添加自定义过滤器
   - 默认内置过滤器：`upper` `lower` `nl`
 - 支持添加自定义指令，提供自定义功能
-  - `EasyTemplate` 内置支持 `include` `contents`
-  - `ExtendTemplate` 提供模板继承功能. 内置支持 `extends` `block` `endblock`
+  - `EasyTemplate` 支持使用布局文件. 支持指令: `layout` `include` `contents`
+  - `ExtendTemplate` 提供模板继承功能. 支持指令: `extends` `block` `endblock`
 - 支持模板中添加注释。 例如: `{{# comments ... #}}`
 
 ## 安装
@@ -330,7 +330,7 @@ $tpl->addDirective('include',function (string $body, string $name) {
 use PhpPkg\EasyTpl\ExtendTemplate;
 
 $et = new ExtendTemplate();
-$et->render('home/index.tpl');
+$et->display('home/index.tpl');
 ```
 
 ### `extend` 模板使用示例

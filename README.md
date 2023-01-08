@@ -24,7 +24,7 @@
 - support add custom filters.
   - default builtin filters: `upper` `lower` `nl`
 - support add custom directive.
-  - `EasyTemplate` built in support `include`: `{{ include('parts/header.tpl') }}`
+  - `EasyTemplate` built in support `layout` `include` `contents`
   - `ExtendTemplate` built in support `extends` `block` `endblock`
 - support comments in templates. eg: `{{# comments ... #}}`
 
@@ -302,6 +302,8 @@ Use in template:
 
 You can use the directives implement some special logic.
 
+>`EasyTemplate` built in support: `layout` `include` `contents`
+
 ```php
 $tpl = EasyTemplate::new();
 $tpl->addDirective(
@@ -312,6 +314,18 @@ $tpl->addDirective(
     }
 );
 ```
+
+### Use layout
+
+- page template `home01.tpl`
+
+```php
+{{ layout('layouts/layout01.tpl') }}
+
+on home: block body;
+```
+
+### Use include
 
 **Use in template**
 
@@ -334,7 +348,7 @@ New directives:
 use PhpPkg\EasyTpl\ExtendTemplate;
 
 $et = new ExtendTemplate();
-$et->render('home/index.tpl');
+$et->display('home/index.tpl');
 ```
 
 ### Examples for extend
@@ -377,6 +391,14 @@ footer contents in layout main.
 
 - [toolkit/fsutil](https://github.com/php-toolkit/fsutil)
 - [toolkit/stdlib](https://github.com/php-toolkit/stdlib)
+
+## Related
+
+- https://github.com/twigphp/Twig
+- https://github.com/nette/latte
+- https://github.com/jenssegers/blade
+- https://github.com/fenom-template/fenom
+- https://github.com/pug-php/pug
 
 ## License
 

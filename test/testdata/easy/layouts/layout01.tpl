@@ -1,7 +1,7 @@
 this is an layout file.
 
-on layout: block header;
+on layout: template header;
 
 {{ contents() }}
 
-on layout: block footer;
+on layout: template footer;

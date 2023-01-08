@@ -1,3 +1,3 @@
 {{ layout('layouts/layout01.tpl') }}
 
-on home: block body;
+on home: template body;
