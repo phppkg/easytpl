@@ -92,7 +92,7 @@ class PregCompilerTest extends BaseTestCase
             ['{{= __LINE__ }}', '<?= __LINE__ ?>'],
             ['{{ echo __LINE__ }}', '<?php echo __LINE__ ?>'],
             ['{{ SomeClass::NAME }}', '<?= SomeClass::NAME ?>'],
-            ['{{ echo SomeClass::NAME }}', '<?= SomeClass::NAME ?>'],
+            ['{{ echo SomeClass::NAME }}', '<?php echo SomeClass::NAME ?>'],
             // prop
             ['{{ SomeClass::$name }}', '<?= SomeClass::$name ?>'],
             // var

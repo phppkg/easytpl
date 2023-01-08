@@ -10,6 +10,7 @@
 namespace PhpPkg\EasyTpl\Compiler;
 
 use function addslashes;
+use function in_array;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
@@ -87,7 +88,12 @@ class PregCompiler extends AbstractCompiler
         return preg_replace_callback(
             "~$openTagE\s*(.+?)$closeTagE~s", // Amixu, iu, s
             function (array $matches) {
-                return $this->parseCodeBlock($matches[1]);
+                // empty line, keep it.
+                if (!$trimmed = trim($matches[1])) {
+                    return $matches[1];
+                }
+
+                return $this->parseCodeBlock($trimmed);
             },
             $tplCode,
             -1,
@@ -129,24 +135,20 @@ class PregCompiler extends AbstractCompiler
      * - 'include'
      * - 'block'
      *
-     * @param string $block
+     * @param string $trimmed trimmed block string.
      *
      * @return string
      */
-    public function parseCodeBlock(string $block): string
+    public function parseCodeBlock(string $trimmed): string
     {
-        // empty line, keep it.
-        if (!$trimmed = trim($block)) {
-            return $block;
-        }
-
         // special '}' -  end char for `if, for, foreach, switch`
         if ($trimmed === '}') {
             return self::PHP_TAG_OPEN . ' } ' . self::PHP_TAG_CLOSE;
         }
 
         $directive = '';
-        $isInline = !str_contains($trimmed, "\n");
+        $unwrapRet = false;
+        $isInline  = !str_contains($trimmed, "\n");
 
         // default is define statement.
         $type  = Token::T_DEFINE;
@@ -197,6 +199,7 @@ class PregCompiler extends AbstractCompiler
             // support user add special directives.
             $directive = $type = $matches[1];
             $handlerFn = $this->customDirectives[$directive];
+            $unwrapRet = in_array($directive, $this->unwrapDirectives, true);
 
             $trimmed = $handlerFn(substr($trimmed, strlen($directive)), $directive);
         } elseif ($isInline && !str_contains($trimmed, '=')) {
@@ -207,7 +210,7 @@ class PregCompiler extends AbstractCompiler
 
         // not need continue handle
         if ($directive || Token::isAloneToken($type)) {
-            return $open . $trimmed . $close;
+            return $unwrapRet ? $trimmed : $open . $trimmed . $close;
         }
 
         // inline echo support filters

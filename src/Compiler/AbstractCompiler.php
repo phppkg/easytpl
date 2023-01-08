@@ -98,6 +98,11 @@ abstract class AbstractCompiler implements CompilerInterface
     protected array $directiveNames = [];
 
     /**
+     * @var array will not wrap PHP tag to directive result.
+     */
+    protected array $unwrapDirectives = [];
+
+    /**
      * @return static
      */
     public static function new(): static
@@ -216,12 +221,20 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * @param string $name
      * @param callable $handler
+     * @param bool $unwrap
      *
      * @return static
      */
-    public function addDirective(string $name, callable $handler): static
+    public function addDirective(string $name, callable $handler, bool $unwrap = false): static
     {
-        $this->directiveNames[] = $name;
+        if (!isset($this->customDirectives[$name])) {
+            $this->directiveNames[] = $name;
+        }
+
+        if ($unwrap) {
+            $this->unwrapDirectives[] = $name;
+        }
+
         $this->customDirectives[$name] = $handler;
 
         return $this;
