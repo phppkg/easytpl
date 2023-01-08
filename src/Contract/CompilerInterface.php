@@ -30,12 +30,13 @@ interface CompilerInterface
     public function disableEchoFilter(): static;
 
     /**
-     * @param string $name
+     * @param string $name Directive name.
      * @param callable $handler
+     * @param bool $unwrap Dont wrap PHP tag after handled result.
      *
      * @return static
      */
-    public function addDirective(string $name, callable $handler): static;
+    public function addDirective(string $name, callable $handler, bool $unwrap = false): static;
 
     /**
      * compile template contents to raw PHP template codes

@@ -16,6 +16,7 @@ class EasyTemplateTest extends BaseTestCase
     {
         return new EasyTemplate([
             'tmpDir' => $this->getTestdataPath('easy-caches'),
+            'tplDir' => __DIR__ . '/testdata/easy',
         ]);
     }
 
@@ -184,7 +185,7 @@ CODE;
 
     public function testRenderFile_ifElse(): void
     {
-        $t = new EasyTemplate();
+        $t = $this->newTemplate();
 
         $tplFile = $this->getTestTplFile('testdata/gen-go-funcs2.tpl');
         $tplVars = ['vars' => ['Info', 'Error', 'Warn']];
@@ -197,7 +198,7 @@ CODE;
 
     public function testRender_foreach(): void
     {
-        $t = new EasyTemplate();
+        $t = $this->newTemplate();
 
         $tplCode = <<<'CODE'
 My name is {{ $name | strtoupper }},
@@ -234,9 +235,7 @@ My develop tags:
 
     public function testRender_include_file(): void
     {
-        $t = new EasyTemplate([
-            'tplDir' => __DIR__ . '/testdata/includes',
-        ]);
+        $t = $this->newTemplate();
 
         $result = $t->renderFile('home', ['name' => 'inhere']);
         $this->assertNotEmpty($result);
@@ -246,7 +245,7 @@ My develop tags:
         // vdump($result);
     }
 
-    public function testCompileCode_noEchoFilter(): void
+    public function testEasy_textTemplate(): void
     {
         $t = EasyTemplate::textTemplate();
 
@@ -256,5 +255,24 @@ My develop tags:
         $this->assertEquals('INHERE', $t->renderString($code, [
             'name' => 'inhere',
         ]));
+    }
+
+    public function testEasy_useLayout01(): void
+    {
+        $tplFile = $this->getTestdataPath('easy/home01.tpl');
+
+        $t = $this->newTemplate();
+        $s = $t->render($tplFile);
+        vdump($s);
+        $this->assertNotEmpty($s);
+    }
+
+    public function testEasy_useLayout02(): void
+    {
+        $tplFile = $this->getTestdataPath('easy/home02.tpl');
+
+        $t = $this->newTemplate();
+        $s = $t->render($tplFile, $this->tplVars);
+        $this->assertNotEmpty($s);
     }
 }

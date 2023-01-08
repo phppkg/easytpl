@@ -12,6 +12,7 @@ namespace PhpPkg\EasyTpl;
 use PhpPkg\EasyTpl\Concern\CompiledTemplateTrait;
 use PhpPkg\EasyTpl\Contract\CompilerInterface;
 use PhpPkg\EasyTpl\Contract\EasyTemplateInterface;
+use RuntimeException;
 use function str_replace;
 
 /**
@@ -70,7 +71,10 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
 {
     use CompiledTemplateTrait;
 
-    public const MAIN_CONTENT_MARK = '{_MAIN_CONTENT_}';
+    /**
+     * content mark on layout file.
+     */
+    public const CONTENT_MARK = '{__CONTENT__}';
 
     /**
      * @var string[]
@@ -148,15 +152,17 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
         })
             // use layout file. syntax: {{ layout('layouts/main.tpl', ['name' => 'inhere']) }}
             ->addDirective('layout', function (string $body) {
-                /** will call {@see useLayout()} */
-                return '$this->useLayout' . $body;
+                /** will call {@see renderLayout()} */
+                return '$this->renderLayout' . $body;
             })
             // use on layout file. syntax: {{ contents }}
-            ->addDirective('contents', fn() => self::MAIN_CONTENT_MARK);
+            ->addDirective('contents', fn() => self::CONTENT_MARK, true);
     }
 
     /**
-     * Render template file, support `layout()` and $this->defaultLayout.
+     * Render template file and returns result.
+     *
+     * - support `layout()` and $this->defaultLayout.
      *
      * @param string $tplFile
      * @param array $tplVars
@@ -173,12 +179,12 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
             $useLayout = true;
         } elseif ($this->defaultLayout) {
             $useLayout = true;
-            $this->useLayout($this->defaultLayout);
+            $this->renderLayout($this->defaultLayout);
         }
 
         // use layout
         if ($useLayout) {
-            $contents = str_replace(self::MAIN_CONTENT_MARK, $contents, $this->layoutContent);
+            $contents = str_replace(self::CONTENT_MARK, $contents, $this->layoutContent);
 
             // reset context
             $this->currentLayout = $this->layoutContent = '';
@@ -188,7 +194,9 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     }
 
     /**
-     * Render view file, support layout(), but not apply $this->defaultLayout.
+     * Render template file and returns result.
+     *
+     * - support layout(), but not apply $this->defaultLayout.
      *
      * @param string $tplFile
      * @param array $tplVars
@@ -202,8 +210,7 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
 
         // use layout
         if ($this->currentLayout) {
-            $contents = str_replace(self::MAIN_CONTENT_MARK, $contents, $this->layoutContent);
-
+            $contents = str_replace(self::CONTENT_MARK, $contents, $this->layoutContent);
             // reset context
             $this->currentLayout = $this->layoutContent = '';
         }
@@ -239,17 +246,27 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     }
 
     /**
-     * use and render layout file
+     * Use and render layout file.
+     *
+     * Usage: {{ layout('layouts/main.tpl') }}
      *
      * @param string $layoutFile
      * @param array $tplVars
      *
      * @return void
      */
-    protected function useLayout(string $layoutFile, array $tplVars = []): void
+    protected function renderLayout(string $layoutFile, array $tplVars = []): void
     {
+        // dont allow cycle use layout()
+        if ($this->currentLayout) {
+            throw new RuntimeException("cannot repeat use 'layout()' on template");
+        }
+
+        $phpFile = $this->compileFile($layoutFile);
+        $contents = $this->doRenderFile($phpFile, $tplVars);
+
         $this->currentLayout = $layoutFile;
-        $this->layoutContent = $this->renderFile($layoutFile, $tplVars);
+        $this->layoutContent = $contents;
     }
 
     /**

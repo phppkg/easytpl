@@ -21,7 +21,7 @@ class ExtendTemplateTest extends BaseTestCase
 
     public function testExtend_renderFile(): void
     {
-        $tplFile = $this->getTestdataPath('extends/home.tpl');
+        $tplFile = $this->getTestdataPath('extend/home.tpl');
 
         $et  = $this->newTemplate();
         $str = $et->renderFile($tplFile);
@@ -30,7 +30,7 @@ class ExtendTemplateTest extends BaseTestCase
         $this->assertStringContainsString('on home: block body;', $str);
         $this->assertStringContainsString('on home: block footer;', $str);
 
-        $tplFile = $this->getTestdataPath('extends/home1.tpl');
+        $tplFile = $this->getTestdataPath('extend/home1.tpl');
 
         $str = $et->renderFile($tplFile, $this->tplVars);
         $this->assertStringContainsString('on layout: block header - name: inhere.', $str);
@@ -59,6 +59,12 @@ TPL;
 
         $str = $et->renderString($tplCode, $this->tplVars);
         $this->assertEquals("my name is inhere1.\n", $str);
+
+        // inline
+        $tplCode = "{{ block 'first' }}my name is {{ name }}.{{ endblock }}";
+
+        $str = $et->renderString($tplCode, $this->tplVars);
+        $this->assertEquals("my name is inhere1.", $str);
     }
 
     public function testExtend_renderString_error(): void
