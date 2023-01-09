@@ -275,6 +275,7 @@ My develop tags:
 
         $t = $this->newTemplate();
         $s = $t->render($tplFile, $this->tplVars);
+        vdump($s);
         $this->assertNotEmpty($s);
         $this->assertStringContainsString('on layout: template header - name: inhere.', $s);
         $this->assertStringContainsString('on home: template body - age: 20.', $s);
