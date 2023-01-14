@@ -51,6 +51,13 @@ abstract class AbstractTemplate implements TemplateInterface
     public string $tplDir = '';
 
     /**
+     * The cache dir for compiled temp php file.
+     *
+     * @var string
+     */
+    public string $tmpDir = '';
+
+    /**
      * custom path resolve
      *
      * @var callable(string): string
@@ -241,6 +248,14 @@ abstract class AbstractTemplate implements TemplateInterface
     public function setTplDir(string $tplDir): void
     {
         $this->tplDir = $tplDir;
+    }
+
+    /**
+     * @param string $tmpDir
+     */
+    public function setTmpDir(string $tmpDir): void
+    {
+        $this->tmpDir = $tmpDir;
     }
 
     /**

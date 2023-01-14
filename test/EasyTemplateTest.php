@@ -20,6 +20,14 @@ class EasyTemplateTest extends BaseTestCase
         ]);
     }
 
+    private function newTexted(): EasyTemplate
+    {
+        return EasyTemplate::newTexted([
+            'tmpDir' => $this->getTestdataPath('texted-caches'),
+            'tplDir' => __DIR__ . '/testdata/easy',
+        ]);
+    }
+
     public function testCompileCode_check(): void
     {
         $t2 = $this->newTemplate();
@@ -247,14 +255,24 @@ My develop tags:
 
     public function testEasy_textTemplate(): void
     {
-        $t = EasyTemplate::textTemplate();
+        $t = $this->newTexted();
+        $vs = [
+            'name' => 'inhere',
+        ];
 
         $code = '{{ $name | upper }}';
         $out = '<?= strtoupper($name) ?>';
         $this->assertEquals($out, $t->compileCode($code));
-        $this->assertEquals('INHERE', $t->renderString($code, [
-            'name' => 'inhere',
-        ]));
+        $this->assertEquals('INHERE', $t->renderString($code, $vs));
+
+        // TODO: php bug if start with #!, this line will be removed
+        $code = <<<TPL
+#!/bin/sh
+#==============
+# comments ...
+hello
+TPL;
+        $this->assertStringNotContainsString('#!/bin/sh', $t->renderString($code));
     }
 
     public function testEasy_useLayout01(): void

@@ -33,6 +33,8 @@ class SimpleTemplate extends AbstractTemplate
     protected string $format = '{{%s}}';
 
     /**
+     * var left chars. auto parsed from $format
+     *
      * @var string
      */
     private string $varLeft = '{{';

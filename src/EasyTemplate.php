@@ -98,16 +98,47 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
 
     /**
      * Create a text template engine instance.
+     * - will disable echo filter for default.
+     *
+     * @param array $config
      *
      * @return static
      */
-    public static function textTemplate(): self
+    public static function newTexted(array $config = []): self
     {
-        $t = new self(['allowExt' => ['.php', '.tpl'],]);
+        if (!isset($config['allowExt'])) {
+            $config['allowExt'] = ['.php', '.tpl'];
+        }
+
+        $t = new self($config);
         // use raw echo for text template
         $t->disableEchoFilter();
 
         return $t;
+    }
+
+    /**
+     * Create a text template engine instance.
+     *
+     * @param array $config
+     *
+     * @return static
+     */
+    public static function textTemplate(array $config = []): self
+    {
+        return self::newTexted($config);
+    }
+
+    /**
+     * Create a text template engine instance.
+     *
+     * @param array $config
+     *
+     * @return static
+     */
+    public static function newRaw(array $config = []): self
+    {
+        return self::newTexted($config);
     }
 
     /**

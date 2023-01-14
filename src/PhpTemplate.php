@@ -36,13 +36,6 @@ use const EXTR_OVERWRITE;
 class PhpTemplate extends AbstractTemplate
 {
     /**
-     * The cache dir for generated temp php file
-     *
-     * @var string
-     */
-    public string $tmpDir = '';
-
-    /**
      * The current auto generated temp php file
      *
      * @var string

@@ -236,6 +236,14 @@ CODE
         foreach ($tests as [$in, $out]) {
             $this->assertEquals($out, $p->compile($in));
         }
+
+        $tplCode = <<<TPL
+#!/bin/sh
+#==============
+# comments ...
+hello
+TPL;
+        $this->assertEquals($tplCode, $p->compile($tplCode));
     }
 
     public function testCompile_if_block():void
