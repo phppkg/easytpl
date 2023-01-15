@@ -89,6 +89,13 @@ abstract class AbstractTemplate implements TemplateInterface
     public function __construct(array $config = [])
     {
         Obj::init($this, $config);
+
+        $this->afterInit();
+    }
+
+    protected function afterInit(): void
+    {
+        // do something
     }
 
     /**

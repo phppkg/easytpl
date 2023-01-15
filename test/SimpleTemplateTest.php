@@ -40,4 +40,28 @@ TPL;
         $this->assertStringContainsString('first tag: php', $str);
         $this->assertStringContainsString('user sex: man', $str);
     }
+
+    public function testSimpleTemplate_withFilters(): void
+    {
+        $st = SimpleTemplate::new();
+        $vs = [
+            'age'  => 300,
+            'name' => 'inhere',
+            'tags' => ['php'],
+            'user' => ['sex' => 'man'],
+        ];
+
+        $tpl = <<<TPL
+Hi, my name is {{ name | substr:0,3 | upper }}, age is {{ age }}.
+first tag: {{ tags.0 | upper}}
+user info: {{ user }}
+TPL;
+
+        $str = $st->renderString($tpl, $vs);
+        $this->assertStringContainsString('name is INH', $str);
+        $this->assertStringContainsString('age is 300', $str);
+        $this->assertStringContainsString('first tag: PHP', $str);
+        $this->assertStringContainsString('user info: {sex: man}', $str);
+
+    }
 }

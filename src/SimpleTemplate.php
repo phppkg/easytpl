@@ -11,11 +11,18 @@ namespace PhpPkg\EasyTpl;
 
 use InvalidArgumentException;
 use PhpPkg\EasyTpl\Concern\AbstractTemplate;
+use Toolkit\Stdlib\Arr;
+use Toolkit\Stdlib\Std\PipeFilters;
 use Toolkit\Stdlib\Str;
 use function array_merge;
 use function explode;
 use function file_get_contents;
+use function is_array;
+use function preg_quote;
+use function preg_replace_callback;
+use function sprintf;
 use function str_contains;
+use function trim;
 
 /**
  * Class SimpleTemplate
@@ -37,11 +44,38 @@ class SimpleTemplate extends AbstractTemplate
      *
      * @var string
      */
-    private string $varLeft = '{{';
+    private string $varStart = '{{';
+
+    /**
+     * regex pattern, build from $format
+     *
+     * @var string
+     */
+    private string $pattern = '';
+
+    /**
+     * @var PipeFilters|null
+     */
+    private ?PipeFilters $pipeFilter = null;
+
+    /**
+     * @return void
+     */
+    protected function afterInit(): void
+    {
+        $this->pipeFilter = PipeFilters::newWithDefaultFilters();
+
+        // add built in filters
+        $this->pipeFilter->addFilters([
+            'nl' => function ($val) {
+                return $val . "\n";
+            }
+        ]);
+    }
 
     /**
      * @param string $tplFile
-     * @param array  $tplVars
+     * @param array $tplVars
      *
      * @return string
      */
@@ -54,13 +88,13 @@ class SimpleTemplate extends AbstractTemplate
 
     /**
      * @param string $tplCode
-     * @param array  $tplVars
+     * @param array $tplVars
      *
      * @return string
      */
     public function renderString(string $tplCode, array $tplVars = []): string
     {
-        if (!str_contains($tplCode, $this->varLeft)) {
+        if (!str_contains($tplCode, $this->varStart)) {
             return $tplCode;
         }
 
@@ -68,7 +102,48 @@ class SimpleTemplate extends AbstractTemplate
             $tplVars = array_merge($this->globalVars, $tplVars);
         }
 
-        return Str::renderVars($tplCode, $tplVars, $this->format);
+        return $this->renderVars($tplCode, $tplVars);
+    }
+
+    /**
+     * @param string $tplCode
+     * @param array $vars
+     *
+     * @return string
+     */
+    protected function renderVars(string $tplCode, array $vars): string
+    {
+        $fmtVars = Arr::flattenMap($vars, Arr\ArrConst::FLAT_DOT_JOIN_INDEX);
+
+        // convert array value to string.
+        foreach ($vars as $name => $val) {
+            if (is_array($val)) {
+                $fmtVars[$name] = Arr::toStringV2($val);
+            }
+        }
+
+        if (!$this->pattern) {
+            $this->parseFormat($this->format);
+        }
+
+        return preg_replace_callback($this->pattern, function (array $match) use ($fmtVars) {
+            $var = trim($match[1]);
+            if (!$var) {
+                return $match[0];
+            }
+
+            $filters = '';
+            if (str_contains($var, '|')) {
+                [$var, $filters] = Str::explode($var, '|', 2);
+            }
+
+            if (isset($fmtVars[$var])) {
+                $val = $fmtVars[$var];
+                return $filters ? $this->pipeFilter->applyStringRules($val, $filters) : $val;
+            }
+
+            return $match[0];
+        }, $tplCode);
     }
 
     /**
@@ -89,8 +164,28 @@ class SimpleTemplate extends AbstractTemplate
         }
 
         $this->format = $format;
-        // get left chars
-        [$left, ] = explode('%s', $format);
-        $this->varLeft = $left;
+        $this->parseFormat($format);
     }
+
+    /**
+     * @return PipeFilters
+     */
+    public function getPipeFilter(): PipeFilters
+    {
+        return $this->pipeFilter;
+    }
+
+    /**
+     * @param string $format
+     *
+     * @return void
+     */
+    protected function parseFormat(string $format): void
+    {
+        [$left, $right] = explode('%s', $format);
+
+        $this->varStart = $left;
+        $this->pattern  = sprintf('/%s([^\n]+?)%s/', preg_quote($left, '/'), preg_quote($right, '/'));
+    }
+
 }
