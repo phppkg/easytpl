@@ -2,6 +2,11 @@ name: Unit-Tests
 
 # https://docs.github.com/cn/actions/reference/workflow-syntax-for-github-actions
 on:
+  pull_request:
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - '**.yml'
   push:
     paths:
       - '**.php'
