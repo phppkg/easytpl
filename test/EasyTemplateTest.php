@@ -93,7 +93,7 @@ class EasyTemplateTest extends BaseTestCase
         $t = $this->newTemplate();
 
         $tplFile = $this->getTestTplFile('testdata/use_all_token.tpl');
-        $result = $t->renderFile($tplFile, $this->tplVars);
+        $result  = $t->renderFile($tplFile, $this->tplVars);
 
         $this->assertNotEmpty($result);
         $this->assertStringNotContainsString('{{', $result);
@@ -102,16 +102,41 @@ class EasyTemplateTest extends BaseTestCase
 
     public function testRender_array_value_use_keyPath(): void
     {
-        $t = new EasyTemplate();
+        $t = $this->newTemplate();
         // inline
         $code = '
 {{= $ctx.pkgName ?? "org.example.entity" }}
 ';
 
-        $tplVars = ['ctx' => ['pkgName' => 'MyPKG']];
-        $result = $t->renderString($code, $tplVars);
-        // vdump($result);
+        $tplVars = ['str' => 'hello', 'ctx' => ['pkgName' => 'MyPKG']];
+        $result  = $t->renderString($code, $tplVars);
         $this->assertEquals("\nMyPKG\n", $result);
+
+        $code   = '{{ $ctx.pkgName }}';
+        $result = $t->renderString($code, $tplVars);
+        $this->assertStringContainsString('MyPKG', $result);
+
+        $tests = [
+            ['tpl' => '{{= $str }}', 'result' => 'hello'],
+            ['tpl' => '{{ str }}', 'result' => 'hello'],
+            ['tpl' => '{{= $ctx.pkgName ?? "org.example.entity" }}', 'result' => 'MyPKG'],
+            ['tpl' => '{{ $ctx.pkgName ?? "org.example.entity" }}', 'result' => 'MyPKG'],
+            // ['tpl' => '{{ ctx.pkgName ?? "org.example.entity" }}', 'result' => 'MyPKG'],
+            ['tpl' => '{{ $ctx.pkgName }}', 'result' => 'MyPKG'],
+            ['tpl' => '{{ ctx.pkgName }}', 'result' => 'MyPKG'],
+            ['tpl' => '{{ $ctx.notExist ?? "fallback" }}', 'result' => 'fallback'],
+            ['tpl' => '{{ ctx.notExist ?? "fallback" }}', 'result' => 'fallback'],
+        ];
+        foreach ($tests as $test) {
+            $result = $t->renderString($test['tpl'], $test['vars'] ?? $tplVars);
+            $this->assertStringContainsString($test['result'], $result);
+        }
+
+        $e = $this->runAndGetException(function () use ($t, $tplVars) {
+            $tpl = '{{ ctx.pkgName ?? "org.example.entity" }}';
+            $t->renderString($tpl, $tplVars);
+        });
+        $this->assertStringContainsString('Undefined constant "ctx"', $e->getMessage());
     }
 
     public function testPhpFuncAsFilter_compile_render(): void
@@ -127,21 +152,21 @@ class EasyTemplateTest extends BaseTestCase
     {
         $t = new EasyTemplate();
         $t->addFilters([
-            'upper' => 'strtoupper',
+            'upper'    => 'strtoupper',
             'myFilter' => function (string $str) {
                 return substr($str, 3);
             },
         ]);
 
         $code = '{{ $name | upper }}';
-        $out = '<?= htmlspecialchars((string)strtoupper($name)) ?>';
+        $out  = '<?= htmlspecialchars((string)strtoupper($name)) ?>';
         $this->assertEquals($out, $t->compileCode($code));
         $this->assertEquals('INHERE', $t->renderString($code, [
             'name' => 'inhere',
         ]));
 
         $code = '{{ $name | myFilter }}';
-        $out = <<<'CODE'
+        $out  = <<<'CODE'
 <?= htmlspecialchars((string)$this->applyFilter('myFilter', $name)) ?>
 CODE;
         $this->assertEquals($out, $t->compileCode($code));
@@ -150,7 +175,7 @@ CODE;
         ]));
 
         $code = '{{ $name | upper | myFilter }}';
-        $out = <<<'CODE'
+        $out  = <<<'CODE'
 <?= htmlspecialchars((string)$this->applyFilter('myFilter', strtoupper($name))) ?>
 CODE;
         $this->assertEquals($out, $t->compileCode($code));
@@ -167,12 +192,12 @@ CODE;
 
         // bad
         $code = '{{ $name |upper }}';
-        $out = '<?= $name |upper ?>';
+        $out  = '<?= $name |upper ?>';
         $this->assertEquals($out, $t->compileCode($code));
 
         // goods
         $code = '{{ $name | upper }}';
-        $out = '<?= htmlspecialchars((string)strtoupper($name)) ?>';
+        $out  = '<?= htmlspecialchars((string)strtoupper($name)) ?>';
         $this->assertEquals($out, $t->compileCode($code));
     }
 
@@ -186,7 +211,7 @@ CODE;
 }}
 {{ $name | upper }}
 CODE;
-        $result = $t->renderString($tplCode);
+        $result  = $t->renderString($tplCode);
         $this->assertNotEmpty($result);
         $this->assertEquals('INHERE', $result);
     }
@@ -255,13 +280,13 @@ My develop tags:
 
     public function testEasy_textTemplate(): void
     {
-        $t = $this->newTexted();
+        $t  = $this->newTexted();
         $vs = [
             'name' => 'inhere',
         ];
 
         $code = '{{ $name | upper }}';
-        $out = '<?= strtoupper($name) ?>';
+        $out  = '<?= strtoupper($name) ?>';
         $this->assertEquals($out, $t->compileCode($code));
         $this->assertEquals('INHERE', $t->renderString($code, $vs));
 

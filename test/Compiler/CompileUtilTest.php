@@ -27,7 +27,28 @@ class CompileUtilTest extends BaseTestCase
 
     public function testPathToArrayAccess(): void
     {
-        $this->assertEquals('ctx.top.sub', CompileUtil::toArrayAccessStmt('ctx.top.sub'));
+        $this->assertEquals('$varName', CompileUtil::toArrayAccessStmt('varName'));
+        $this->assertEquals("= varName", CompileUtil::toArrayAccessStmt('= varName'));
+
+        $this->assertEquals("\$ctx['top']['sub']", CompileUtil::toArrayAccessStmt('ctx.top.sub'));
         $this->assertEquals("\$ctx['top']['sub']", CompileUtil::toArrayAccessStmt('$ctx.top.sub'));
+
+        // with fallback statement
+        $ret = <<<EOT
+\$ctx['top']['sub'] ?? "fallback"
+EOT;
+
+        $this->assertEquals($ret, CompileUtil::toArrayAccessStmt('ctx.top.sub ?? "fallback"'));
+        $this->assertEquals($ret, CompileUtil::toArrayAccessStmt('$ctx.top.sub ?? "fallback"'));
+
+        $ret = <<<EOT
+= \$ctx['top']['sub'] ?? "fallback"
+EOT;
+        $this->assertEquals($ret, CompileUtil::toArrayAccessStmt('= $ctx.top.sub ?? "fallback"'));
+
+        $ret = <<<EOT
+= \$ctx['top']['sub'] ?? "fall.back"
+EOT;
+        $this->assertEquals($ret, CompileUtil::toArrayAccessStmt('= $ctx.top.sub ?? "fall.back"'));
     }
 }

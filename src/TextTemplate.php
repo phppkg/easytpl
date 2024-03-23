@@ -9,29 +9,21 @@
 
 namespace PhpPkg\EasyTpl;
 
-use PhpPkg\EasyTpl\Contract\CompilerInterface;
-
 /**
  * class TextTemplate
+ * - will disable echo filter for default.
  *
  * @author inhere
- * @deprecated please use {@see EasyTemplate::textTemplate() }
  */
-class TextTemplate extends EasyTemplate
+class TextTemplate
 {
     /**
-     * @var string[]
+     * @param array $config
+     *
+     * @return EasyTemplate
      */
-    protected array $allowExt = ['.php', '.tpl'];
-
-    /**
-     * @param CompilerInterface $compiler
-     */
-    protected function initCompiler(CompilerInterface $compiler): void
+    public static function new(array $config = []): EasyTemplate
     {
-        parent::initCompiler($compiler);
-
-        // use raw echo for text template
-        $compiler->disableEchoFilter();
+        return EasyTemplate::newTexted($config);
     }
 }

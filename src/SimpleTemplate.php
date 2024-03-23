@@ -113,20 +113,11 @@ class SimpleTemplate extends AbstractTemplate
      */
     protected function renderVars(string $tplCode, array $vars): string
     {
-        $fmtVars = Arr::flattenMap($vars, Arr\ArrConst::FLAT_DOT_JOIN_INDEX);
-
-        // convert array value to string.
-        foreach ($vars as $name => $val) {
-            if (is_array($val)) {
-                $fmtVars[$name] = Arr::toStringV2($val);
-            }
-        }
-
         if (!$this->pattern) {
             $this->parseFormat($this->format);
         }
 
-        return preg_replace_callback($this->pattern, function (array $match) use ($fmtVars) {
+        return preg_replace_callback($this->pattern, function (array $match) use ($vars) {
             $var = trim($match[1]);
             if (!$var) {
                 return $match[0];
@@ -137,9 +128,10 @@ class SimpleTemplate extends AbstractTemplate
                 [$var, $filters] = Str::explode($var, '|', 2);
             }
 
-            if (isset($fmtVars[$var])) {
-                $val = $fmtVars[$var];
-                return $filters ? $this->pipeFilter->applyStringRules($val, $filters) : $val;
+            $value = Arr::getByPath($vars, $var);
+            if ($value !== null) {
+                $value = is_array($value) ? Arr::toStringV2($value) : (string)$value;
+                return $filters ? $this->pipeFilter->applyStringRules($value, $filters) : $value;
             }
 
             return $match[0];

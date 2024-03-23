@@ -144,7 +144,10 @@ class EasyTemplate extends PhpTemplate implements EasyTemplateInterface
     /**
      * Class constructor.
      *
-     * @param array{tmpDir: string, compiler: class-string|CompilerInterface} $config
+     * @param array{
+     *     tmpDir: string,
+     *     tplDir: string,
+     *     compiler: class-string|CompilerInterface } $config
      */
     public function __construct(array $config = [])
     {

@@ -229,8 +229,9 @@ class PregCompiler extends AbstractCompiler
 
         // handle quick access array key.
         // - convert $ctx.top.sub to $ctx['top']['sub']
-        $trimmed = CompileUtil::toArrayAccessStmt($trimmed);
-
+        if (str_contains($trimmed, '.')) {
+            $trimmed = CompileUtil::toArrayAccessStmt($trimmed);
+        }
         return $open . $trimmed . $close;
     }
 
