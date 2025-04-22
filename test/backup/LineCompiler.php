@@ -16,7 +16,7 @@ use function trim;
 use const PREG_SPLIT_NO_EMPTY;
 
 /**
- * class LineCompiler - compile template code to php code
+ * class LineCompiler - compile template code to php code TODO
  *
  * @author inhere
  */

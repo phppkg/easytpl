@@ -21,12 +21,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+<<<<<<< Updated upstream
         php: [8.1, 8.2, 8.3, 8.4]
         os: [ubuntu-latest, macOS-latest] # windows-latest,
 #        include: # will not testing on php 7.2
 #          - os: 'ubuntu-latest'
 #            php: '7.2'
 #            phpunit: '8.5.13'
+=======
+        php: [8.1, 8.2, 8.3]
+        os: [ubuntu-latest, macOS-latest, windows-latest] # windows-latest,
+>>>>>>> Stashed changes
 
     steps:
       - name: Checkout
