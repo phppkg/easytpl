@@ -1,7 +1,7 @@
 # EasyTpl
 
 [![License](https://img.shields.io/github/license/phppkg/easytpl.svg?style=flat-square)](LICENSE)
-[![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
+[![Php Version](https://img.shields.io/packagist/php-v/phppkg/easytpl?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
 [![zh-CN readme](https://img.shields.io/badge/中文-Readme-brightgreen.svg?style=for-the-badge&maxAge=2592000)](README.zh-CN.md)
@@ -29,8 +29,6 @@
 - support comments in templates. eg: `{{# comments ... #}}`
 
 ## Install
-
-- Required PHP 8.0+
 
 **composer**
 
@@ -315,6 +313,8 @@ $tpl->addDirective(
 );
 ```
 
+------
+
 ### Use layout
 
 - page template `home01.tpl`
@@ -332,6 +332,8 @@ on home: block body;
 ```php
 {{ include('part/header.tpl', ['title' => 'My world']) }}
 ```
+
+------
 
 ## Extends template
 
@@ -386,6 +388,8 @@ header contents in layout main.
 body contents in home index.
 footer contents in layout main.
 ```
+
+------
 
 ## Dep packages
 

@@ -1,7 +1,7 @@
 # EasyTpl
 
 [![License](https://img.shields.io/github/license/phppkg/easytpl.svg?style=flat-square)](LICENSE)
-[![Php Version](https://img.shields.io/badge/php-%3E=8.0-brightgreen.svg?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
+[![Php Version](https://img.shields.io/packagist/php-v/phppkg/easytpl?maxAge=2592000)](https://packagist.org/packages/phppkg/easytpl)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/phppkg/easytpl)](https://github.com/phppkg/easytpl)
 [![Actions Status](https://github.com/phppkg/easytpl/workflows/Unit-Tests/badge.svg)](https://github.com/phppkg/easytpl/actions)
 [![English readme](https://img.shields.io/badge/English-Readme-brightgreen.svg?style=for-the-badge&maxAge=2592000)](README.md)
@@ -29,8 +29,6 @@
 - 支持模板中添加注释。 例如: `{{# comments ... #}}`
 
 ## 安装
-
-- 需要 PHP 8.0+
 
 **composer**
 
@@ -303,11 +301,27 @@ $tpl->addFilters([
 
 ```php
 $tpl = EasyTemplate::new();
-$tpl->addDirective('include',function (string $body, string $name) {
+$tpl->addDirective('include', function (string $body, string $name) {
     /** will call {@see EasyTemplate::include()} */
     return '$this->include' . $body;
 });
 ```
+
+> TIP: 内置的 `layout`, `include` 等指令就是这样实现的。
+
+------
+
+## `layout` 布局模板
+
+- page template `home01.tpl`
+
+```php
+{{ layout('layouts/layout01.tpl') }}
+
+on home: block body;
+```
+
+### Use include
 
 **在模板中使用**:
 
@@ -315,7 +329,9 @@ $tpl->addDirective('include',function (string $body, string $name) {
 {{ include('part/header.tpl', ['title' => 'My world']) }}
 ```
 
-## `extend` 模板
+------
+
+## `extend` 布局模板
 
 新增指令:
 
@@ -368,6 +384,8 @@ header contents in layout main.
 body contents in home index.
 footer contents in layout main.
 ```
+
+------
 
 ## Dep packages
 
